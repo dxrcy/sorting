@@ -24,8 +24,9 @@ fn main() -> io::Result<()> {
     list.shuffle(&mut rng);
 
     let iter: Box<dyn Iterator<Item = sorting::SortState>> = match args.algorithm {
-        Algorithm::Selection => Box::new(sorts::SelectionSort::new(&mut list)),
-        Algorithm::Insertion => Box::new(sorts::InsertionSort::new(&mut list)),
+        Algorithm::Selection => Box::new(sorts::Selection::new(&mut list)),
+        Algorithm::Insertion => Box::new(sorts::Insertion::new(&mut list)),
+        Algorithm::Bubble => Box::new(sorts::Bubble::new(&mut list)),
     };
 
     terminal::enable_raw_mode()?;

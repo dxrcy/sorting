@@ -1,7 +1,7 @@
 use crate::{Compare, SortState, Sorter, Value};
 
 #[derive(Debug)]
-pub struct SelectionSort<'a> {
+pub struct Selection<'a> {
     list: &'a mut [Value],
     i: usize,
     j: usize,
@@ -9,14 +9,14 @@ pub struct SelectionSort<'a> {
     just_compared: Compare,
 }
 
-impl<'a> Iterator for SelectionSort<'a> {
+impl<'a> Iterator for Selection<'a> {
     type Item = SortState;
     fn next(&mut self) -> Option<Self::Item> {
         Sorter::next(self)
     }
 }
 
-impl<'a> SelectionSort<'a> {
+impl<'a> Selection<'a> {
     pub fn new(list: &'a mut [Value]) -> Self {
         Self {
             list,
@@ -28,7 +28,7 @@ impl<'a> SelectionSort<'a> {
     }
 }
 
-impl<'a> Sorter<'a> for SelectionSort<'a> {
+impl<'a> Sorter<'a> for Selection<'a> {
     fn next(&mut self) -> Option<SortState> {
         if self.i >= self.list.len() - 1 {
             // return if `None`

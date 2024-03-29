@@ -1,47 +1,38 @@
 use crate::{Compare, SortState, Sorter, Value};
 
 #[derive(Debug)]
-pub struct Insertion<'a> {
+pub struct Bubble<'a> {
     list: &'a mut [Value],
     i: usize,
     j: usize,
+    did_any_swaps: bool,
     just_compared: Compare,
 }
 
-impl<'a> Iterator for Insertion<'a> {
+impl<'a> Iterator for Bubble<'a> {
     type Item = SortState;
     fn next(&mut self) -> Option<Self::Item> {
         Sorter::next(self)
     }
 }
 
-impl<'a> Insertion<'a> {
+impl<'a> Bubble<'a> {
     pub fn new(list: &'a mut [Value]) -> Self {
         Self {
             list,
-            i: 1,
-            j: 1,
+            i: 0,
+            j: 0,
+            did_any_swaps: false,
             just_compared: None,
         }
     }
 }
 
-impl<'a> Sorter<'a> for Insertion<'a> {
+impl<'a> Sorter<'a> for Bubble<'a> {
     fn next(&mut self) -> Option<SortState> {
         if self.just_compared.is_none() {
-            // this is a bit of a hack
-            // note: `>` vs `>=`
-            if self.i > self.list.len() {
-                return None;
-            }
             if self.i >= self.list.len() {
-                self.i += 1;
-                return Some(SortState {
-                    list: self.list.to_vec(),
-                    just_compared: None,
-                    did_swap: false,
-                    is_done: true,
-                });
+                return None;
             }
 
             self.just_compared = Some([0, 0]);
@@ -53,30 +44,41 @@ impl<'a> Sorter<'a> for Insertion<'a> {
             });
         }
 
-        if self.j > 0 {
-            self.just_compared = Some([self.j - 1, self.j]);
-        }
+        if self.j >= self.list.len() - 1 {
+            if !self.did_any_swaps {
+                self.just_compared = None;
+                return Some(SortState {
+                    list: self.list.to_vec(),
+                    just_compared: None,
+                    did_swap: false,
+                    is_done: true,
+                });
+            }
 
-        let mut did_swap = false;
-        if self.j == 0 || self.list[self.j - 1] <= self.list[self.j] {
             self.i += 1;
-            self.j = self.i;
-        } else {
-            self.list.swap(self.j, self.j - 1);
-            self.j -= 1;
-            did_swap = true;
+            self.j = 0;
+            self.did_any_swaps = false;
         }
 
         if self.i >= self.list.len() {
-            let just_compared = self.just_compared;
             self.just_compared = None;
             return Some(SortState {
                 list: self.list.to_vec(),
-                just_compared,
-                did_swap,
-                is_done: false,
+                just_compared: None,
+                did_swap: false,
+                is_done: true,
             });
         }
+
+        let mut did_swap = false;
+        self.just_compared = Some([self.j, self.j + 1]);
+        if self.list[self.j] > self.list[self.j + 1] {
+            self.list.swap(self.j, self.j + 1);
+            did_swap = true;
+            self.did_any_swaps = true;
+        }
+
+        self.j += 1;
 
         Some(SortState {
             list: self.list.to_vec(),

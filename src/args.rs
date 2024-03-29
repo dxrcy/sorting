@@ -18,6 +18,7 @@ pub struct Args {
 pub enum Algorithm {
     Selection,
     Insertion,
+    Bubble,
 }
 
 impl Display for Algorithm {
