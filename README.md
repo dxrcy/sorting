@@ -8,3 +8,5 @@ Supported algorithms:
 
 Algorithms must be written as an `Iterator`, so it is rather hard to write.
 
+![Screenshot](./screenshot.png)
+
