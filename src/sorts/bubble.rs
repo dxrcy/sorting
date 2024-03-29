@@ -47,6 +47,7 @@ impl<'a> Sorter<'a> for Bubble<'a> {
         if self.j >= self.list.len() - 1 {
             if !self.did_any_swaps {
                 self.just_compared = None;
+                self.i = self.list.len();
                 return Some(SortState {
                     list: self.list.to_vec(),
                     just_compared: None,
