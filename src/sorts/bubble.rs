@@ -5,7 +5,8 @@ pub struct Bubble<'a> {
     list: &'a mut [Value],
     i: usize,
     j: usize,
-    did_any_swaps: bool,
+    last_swap: usize,
+    prev_last_swap: usize,
     just_compared: Compare,
 }
 
@@ -18,11 +19,13 @@ impl<'a> Iterator for Bubble<'a> {
 
 impl<'a> Bubble<'a> {
     pub fn new(list: &'a mut [Value]) -> Self {
+        let last_swap = list.len() - 1;
         Self {
             list,
             i: 0,
             j: 0,
-            did_any_swaps: false,
+            last_swap,
+            prev_last_swap: last_swap,
             just_compared: None,
         }
     }
@@ -44,8 +47,8 @@ impl<'a> Sorter<'a> for Bubble<'a> {
             });
         }
 
-        if self.j >= self.list.len() - 1 {
-            if !self.did_any_swaps {
+        if self.j >= self.prev_last_swap {
+            if self.prev_last_swap == 1 {
                 self.just_compared = None;
                 self.i = self.list.len();
                 return Some(SortState {
@@ -56,9 +59,10 @@ impl<'a> Sorter<'a> for Bubble<'a> {
                 });
             }
 
+            self.prev_last_swap = self.last_swap;
+
             self.i += 1;
             self.j = 0;
-            self.did_any_swaps = false;
         }
 
         if self.i >= self.list.len() {
@@ -76,7 +80,7 @@ impl<'a> Sorter<'a> for Bubble<'a> {
         if self.list[self.j] > self.list[self.j + 1] {
             self.list.swap(self.j, self.j + 1);
             did_swap = true;
-            self.did_any_swaps = true;
+            self.last_swap = self.j;
         }
 
         self.j += 1;
