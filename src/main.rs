@@ -2,7 +2,7 @@ use crossterm::{
     cursor,
     event::{self, Event, KeyCode, KeyEvent, KeyModifiers},
     execute,
-    style::{Color, ResetColor, SetBackgroundColor, SetForegroundColor},
+    style::{Color, ResetColor, SetForegroundColor},
     terminal::{self, Clear, ClearType},
 };
 use rand::seq::SliceRandom;
@@ -32,12 +32,7 @@ fn main() -> io::Result<()> {
 
     terminal::enable_raw_mode()?;
 
-    execute!(
-        io::stdout(),
-        Clear(ClearType::All),
-        crossterm::cursor::Hide,
-        SetBackgroundColor(Color::Rgb { r: 0, g: 0, b: 0 }),
-    )?;
+    execute!(io::stdout(), Clear(ClearType::All), crossterm::cursor::Hide,)?;
 
     'sort: for state in iter {
         if event::poll(std::time::Duration::from_millis(1)).unwrap() {
@@ -62,7 +57,7 @@ fn main() -> io::Result<()> {
         for (x, value) in state.list.iter().enumerate() {
             let h = x as f64 * 360.0 / size as f64;
             let s = 100.0;
-            let l = if state.compare.is_some_and(|[a, b]| a == x || b == x) {
+            let l = if state.just_compared.is_some_and(|[a, b]| a == x || b == x) {
                 100.0
             } else {
                 50.0
@@ -105,11 +100,6 @@ fn main() -> io::Result<()> {
     }
 
     Ok(())
-}
-
-fn clear() {
-    print!("\x1B[2J\x1B[1;1H");
-    io::stdout().flush().unwrap();
 }
 
 fn is_sorted(list: &[Value]) -> bool {

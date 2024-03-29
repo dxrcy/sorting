@@ -6,7 +6,7 @@ pub struct SelectionSort<'a> {
     i: usize,
     j: usize,
     min_index: usize,
-    compare: Compare,
+    just_compared: Compare,
 }
 
 impl<'a> Iterator for SelectionSort<'a> {
@@ -23,38 +23,38 @@ impl<'a> Sorter<'a> for SelectionSort<'a> {
             i: 0,
             j: 1,
             min_index: 0,
-            compare: None,
+            just_compared: None,
         }
     }
 
     fn next(&mut self) -> Option<SortState> {
         if self.i >= self.list.len() - 1 {
-            if self.compare.is_none() {
+            if self.just_compared.is_none() {
                 return None;
             }
 
-            self.compare = None;
+            self.just_compared = None;
 
             return Some(SortState {
                 list: self.list.to_vec(),
-                compare: None,
+                just_compared: None,
                 did_swap: false,
                 is_done: true,
             });
         }
 
-        if self.compare.is_none() {
-            self.compare = Some([0, 0]);
+        if self.just_compared.is_none() {
+            self.just_compared = Some([0, 0]);
 
             return Some(SortState {
                 list: self.list.to_vec(),
-                compare: None,
+                just_compared: None,
                 did_swap: false,
                 is_done: false,
             });
         }
 
-        self.compare = Some([self.j, self.min_index]);
+        self.just_compared = Some([self.j, self.min_index]);
         if self.list[self.j] < self.list[self.min_index] {
             self.min_index = self.j;
         }
@@ -72,7 +72,7 @@ impl<'a> Sorter<'a> for SelectionSort<'a> {
 
         Some(SortState {
             list: self.list.to_vec(),
-            compare: self.compare,
+            just_compared: self.just_compared,
             did_swap,
             is_done: false,
         })
