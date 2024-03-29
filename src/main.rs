@@ -93,7 +93,9 @@ fn main() -> io::Result<()> {
     )?;
     terminal::disable_raw_mode()?;
 
-    assert!(is_sorted(&list), "The list is sorted");
+    if !is_sorted(&list) {
+        println!("{BRIGHT}{RED}The list is not sorted.{RESET}");
+    }
 
     Ok(())
 }
