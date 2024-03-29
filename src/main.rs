@@ -97,7 +97,7 @@ fn main() -> io::Result<()> {
     terminal::disable_raw_mode()?;
 
     if !is_sorted(&list) {
-        println!("{BRIGHT}{RED}{}{RESET}", "The list is not sorted\r");
+        println!("{BRIGHT}{RED}The list is not sorted\r{RESET}");
     }
 
     Ok(())

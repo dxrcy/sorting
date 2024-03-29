@@ -29,7 +29,9 @@ impl<'a> InsertionSort<'a> {
 impl<'a> Sorter<'a> for InsertionSort<'a> {
     fn next(&mut self) -> Option<SortState> {
         if self.just_compared.is_none() {
-            if self.i >= self.list.len() + 1 {
+            // this is a bit of a hack
+            // note: `>` vs `>=`
+            if self.i > self.list.len() {
                 return None;
             }
             if self.i >= self.list.len() {

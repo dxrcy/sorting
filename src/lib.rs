@@ -19,7 +19,7 @@ pub trait Sorter<'a> {
     fn next(&mut self) -> Option<SortState>;
 }
 
-impl<'a> std::fmt::Display for SortState {
+impl std::fmt::Display for SortState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{DIM}{}{RESET} ", "_".repeat((self.list.len() + 1) * 4))?;
         writeln!(f)?;
@@ -32,12 +32,10 @@ impl<'a> std::fmt::Display for SortState {
                 } else if i == b {
                     write!(f, "{BRIGHT}{color}")?;
                 }
+            } else if self.is_done {
+                write!(f, "{BRIGHT}{GREEN}")?;
             } else {
-                if self.is_done {
-                    write!(f, "{BRIGHT}{GREEN}")?;
-                } else {
-                    write!(f, "{RED}")?;
-                };
+                write!(f, "{RED}")?;
             }
             write!(f, "{}{RESET}", item)?;
         }

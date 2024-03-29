@@ -31,9 +31,8 @@ impl<'a> SelectionSort<'a> {
 impl<'a> Sorter<'a> for SelectionSort<'a> {
     fn next(&mut self) -> Option<SortState> {
         if self.i >= self.list.len() - 1 {
-            if self.just_compared.is_none() {
-                return None;
-            }
+            // return if `None`
+            self.just_compared?;
 
             self.just_compared = None;
 
