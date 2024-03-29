@@ -1,4 +1,4 @@
-use crate::{Compare, SortState, Sorter, Value};
+use crate::{Compare, SortIterator, SortState, Sorter, Value};
 
 #[derive(Debug)]
 pub struct SelectionSort<'a> {
@@ -16,8 +16,8 @@ impl<'a> Iterator for SelectionSort<'a> {
     }
 }
 
-impl<'a> Sorter<'a> for SelectionSort<'a> {
-    fn new(list: &'a mut [Value]) -> Self {
+impl<'a> SelectionSort<'a> {
+    pub fn new(list: &'a mut [Value]) -> Self {
         Self {
             list,
             i: 0,
@@ -26,7 +26,11 @@ impl<'a> Sorter<'a> for SelectionSort<'a> {
             just_compared: None,
         }
     }
+}
 
+impl<'a> SortIterator for SelectionSort<'a> {}
+
+impl<'a> Sorter<'a> for SelectionSort<'a> {
     fn next(&mut self) -> Option<SortState> {
         if self.i >= self.list.len() - 1 {
             if self.just_compared.is_none() {
