@@ -9,7 +9,7 @@ use crossterm::{
     terminal::{self, Clear, ClearType},
 };
 use rand::seq::SliceRandom;
-use std::{io, thread, time};
+use std::{io, process, thread, time};
 
 use args::{Algorithm, Args};
 use sorting::{colors::*, sorts, Value};
@@ -96,6 +96,7 @@ fn main() -> io::Result<()> {
 
     if !is_sorted(&list) {
         println!("{BRIGHT}{RED}The list is not sorted.{RESET}");
+        process::exit(1);
     }
 
     Ok(())
