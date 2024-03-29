@@ -10,7 +10,7 @@ use rand::seq::SliceRandom;
 use std::env;
 use std::io::{self, Write};
 
-use sorting::{colors::*, sorts::SelectionSort, Sorter, Value};
+use sorting::{colors::*, sorts, Sorter, Value};
 
 fn main() -> io::Result<()> {
     let mut args = env::args().skip(1);
@@ -28,7 +28,7 @@ fn main() -> io::Result<()> {
     let mut rng = rand::thread_rng();
     list.shuffle(&mut rng);
 
-    let iter = SelectionSort::new(&mut list);
+    let iter = sorts::InsertionSort::new(&mut list);
 
     terminal::enable_raw_mode()?;
 
