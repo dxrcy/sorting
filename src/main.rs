@@ -1,3 +1,6 @@
+mod args;
+
+use clap::Parser;
 use crossterm::{
     cursor,
     event::{self, Event, KeyCode, KeyEvent, KeyModifiers},
@@ -7,22 +10,17 @@ use crossterm::{
 };
 use rand::seq::SliceRandom;
 
-use std::env;
-use std::io::{self, Write};
+use std::{
+    io::{self, Write},
+    thread, time,
+};
 
 use sorting::{colors::*, sorts, Sorter, Value};
 
 fn main() -> io::Result<()> {
-    let mut args = env::args().skip(1);
+    let args = args::Args::parse();
 
-    let size: usize = match args.next().map(|arg| arg.parse()) {
-        Some(Ok(x)) => x,
-        _ => 20,
-    };
-    let frame_duration: u64 = match args.next().map(|arg| arg.parse()) {
-        Some(Ok(x)) => x,
-        _ => 0,
-    };
+    let size = args.size;
 
     let mut list: Vec<_> = (1..=size as Value).collect();
     let mut rng = rand::thread_rng();
@@ -35,7 +33,7 @@ fn main() -> io::Result<()> {
     execute!(io::stdout(), Clear(ClearType::All), crossterm::cursor::Hide,)?;
 
     'sort: for state in iter {
-        if event::poll(std::time::Duration::from_millis(1)).unwrap() {
+        if event::poll(time::Duration::from_millis(1)).unwrap() {
             if let Ok(event) = event::read() {
                 match event {
                     Event::Key(KeyEvent {
@@ -81,9 +79,9 @@ fn main() -> io::Result<()> {
             }
         }
 
-        if frame_duration > 0 {
+        if args.frame_duration > 0 {
             io::stdout().flush()?;
-            std::thread::sleep(std::time::Duration::from_millis(frame_duration));
+            thread::sleep(time::Duration::from_millis(args.frame_duration));
         }
     }
 
