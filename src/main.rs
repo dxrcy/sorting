@@ -55,7 +55,7 @@ fn main() -> io::Result<()> {
         }
 
         for (x, value) in state.list.iter().enumerate() {
-            let h = x as f64 * 360.0 / size as f64;
+            let h = *value as f64 * 360.0 / size as f64;
             let s = 100.0;
             let l = if state.just_compared.is_some_and(|[a, b]| a == x || b == x) {
                 100.0
