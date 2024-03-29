@@ -4,21 +4,18 @@ use clap::Parser;
 use crossterm::{
     cursor,
     event::{self, Event, KeyCode, KeyEvent, KeyModifiers},
-    execute,
+    execute, queue,
     style::{Color, ResetColor, SetForegroundColor},
     terminal::{self, Clear, ClearType},
 };
 use rand::seq::SliceRandom;
+use std::{io, thread, time};
 
-use std::{
-    io::{self, Write},
-    thread, time,
-};
-
+use args::{Algorithm, Args};
 use sorting::{colors::*, sorts, Value};
 
 fn main() -> io::Result<()> {
-    let args = args::Args::parse();
+    let args = Args::parse();
 
     let size = args.size;
 
@@ -27,13 +24,14 @@ fn main() -> io::Result<()> {
     list.shuffle(&mut rng);
 
     let iter: Box<dyn Iterator<Item = sorting::SortState>> = match args.algorithm {
-        args::Algorithm::Selection => Box::new(sorts::SelectionSort::new(&mut list)),
-        args::Algorithm::Insertion => Box::new(sorts::InsertionSort::new(&mut list)),
+        Algorithm::Selection => Box::new(sorts::SelectionSort::new(&mut list)),
+        Algorithm::Insertion => Box::new(sorts::InsertionSort::new(&mut list)),
     };
 
     terminal::enable_raw_mode()?;
+    let mut stdout = io::stdout();
 
-    execute!(io::stdout(), Clear(ClearType::All), crossterm::cursor::Hide,)?;
+    execute!(stdout, Clear(ClearType::All), crossterm::cursor::Hide,)?;
 
     'sort: for state in iter {
         if event::poll(time::Duration::from_millis(1)).unwrap() {
@@ -66,11 +64,11 @@ fn main() -> io::Result<()> {
 
             let (r, g, b) = hsl_to_rgb(h, s, l);
 
-            execute!(io::stdout(), SetForegroundColor(Color::Rgb { r, g, b }))?;
+            queue!(stdout, SetForegroundColor(Color::Rgb { r, g, b }))?;
 
             for y in 0..size {
-                execute!(
-                    io::stdout(),
+                queue!(
+                    stdout,
                     cursor::MoveTo(x as u16 * 2, size as u16 - y as u16 - 1)
                 )?;
 
@@ -83,22 +81,19 @@ fn main() -> io::Result<()> {
         }
 
         if args.frame_duration > 0 {
-            io::stdout().flush()?;
             thread::sleep(time::Duration::from_millis(args.frame_duration));
         }
     }
 
     execute!(
-        io::stdout(),
+        stdout,
         cursor::MoveTo(0, size as u16),
         cursor::Show,
         ResetColor,
     )?;
     terminal::disable_raw_mode()?;
 
-    if !is_sorted(&list) {
-        println!("{BRIGHT}{RED}The list is not sorted\r{RESET}");
-    }
+    assert!(is_sorted(&list), "The list is sorted");
 
     Ok(())
 }
