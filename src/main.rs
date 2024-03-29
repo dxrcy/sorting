@@ -1,5 +1,7 @@
 use crossterm::{
-    cursor, execute,
+    cursor,
+    event::{self, Event, KeyCode, KeyEvent, KeyModifiers},
+    execute,
     style::{Color, ResetColor, SetBackgroundColor, SetForegroundColor},
     terminal::{self, Clear, ClearType},
 };
@@ -37,7 +39,26 @@ fn main() -> io::Result<()> {
         SetBackgroundColor(Color::Rgb { r: 0, g: 0, b: 0 }),
     )?;
 
-    for state in iter {
+    'sort: for state in iter {
+        if event::poll(std::time::Duration::from_millis(1)).unwrap() {
+            if let Ok(event) = event::read() {
+                match event {
+                    Event::Key(KeyEvent {
+                        code, modifiers, ..
+                    }) => {
+                        if code == KeyCode::Esc
+                            || code == KeyCode::Char('q')
+                            || (code == KeyCode::Char('c')
+                                && modifiers.contains(KeyModifiers::CONTROL))
+                        {
+                            break 'sort;
+                        }
+                    }
+                    _ => break,
+                }
+            }
+        }
+
         for (x, value) in state.list.iter().enumerate() {
             let h = x as f64 * 360.0 / size as f64;
             let s = 100.0;
@@ -65,8 +86,10 @@ fn main() -> io::Result<()> {
             }
         }
 
-        io::stdout().flush()?;
-        std::thread::sleep(std::time::Duration::from_millis(frame_duration));
+        if frame_duration > 0 {
+            io::stdout().flush()?;
+            std::thread::sleep(std::time::Duration::from_millis(frame_duration));
+        }
     }
 
     execute!(
