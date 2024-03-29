@@ -1,4 +1,4 @@
-use crate::{Compare, SortIterator, SortState, Sorter, Value};
+use crate::{Compare, SortState, Sorter, Value};
 
 #[derive(Debug)]
 pub struct InsertionSort<'a> {
@@ -25,8 +25,6 @@ impl<'a> InsertionSort<'a> {
         }
     }
 }
-
-impl<'a> SortIterator for InsertionSort<'a> {}
 
 impl<'a> Sorter<'a> for InsertionSort<'a> {
     fn next(&mut self) -> Option<SortState> {

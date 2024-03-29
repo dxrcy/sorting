@@ -15,7 +15,7 @@ use std::{
     thread, time,
 };
 
-use sorting::{colors::*, sorts, SortIterator, Value};
+use sorting::{colors::*, sorts, Value};
 
 fn main() -> io::Result<()> {
     let args = args::Args::parse();
@@ -26,7 +26,7 @@ fn main() -> io::Result<()> {
     let mut rng = rand::thread_rng();
     list.shuffle(&mut rng);
 
-    let iter: Box<dyn SortIterator> = match args.algorithm {
+    let iter: Box<dyn Iterator<Item = sorting::SortState>> = match args.algorithm {
         args::Algorithm::Selection => Box::new(sorts::SelectionSort::new(&mut list)),
         args::Algorithm::Insertion => Box::new(sorts::InsertionSort::new(&mut list)),
     };

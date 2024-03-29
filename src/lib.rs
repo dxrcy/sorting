@@ -15,8 +15,6 @@ pub struct SortState {
     pub is_done: bool,
 }
 
-pub trait SortIterator: Iterator<Item = SortState> {}
-
 pub trait Sorter<'a> {
     fn next(&mut self) -> Option<SortState>;
 }

@@ -1,4 +1,4 @@
-use crate::{Compare, SortIterator, SortState, Sorter, Value};
+use crate::{Compare, SortState, Sorter, Value};
 
 #[derive(Debug)]
 pub struct SelectionSort<'a> {
@@ -27,8 +27,6 @@ impl<'a> SelectionSort<'a> {
         }
     }
 }
-
-impl<'a> SortIterator for SelectionSort<'a> {}
 
 impl<'a> Sorter<'a> for SelectionSort<'a> {
     fn next(&mut self) -> Option<SortState> {
