@@ -4,14 +4,25 @@ use crossterm::{
     terminal::{self, Clear, ClearType},
 };
 use rand::seq::SliceRandom;
+
+use std::env;
 use std::io::{self, Write};
 
 use sorting::{colors::*, sorts::SelectionSort, Sorter, Value};
 
 fn main() -> io::Result<()> {
-    const SIZE: usize = 50;
+    let mut args = env::args().skip(1);
 
-    let mut list: Vec<_> = (1..=SIZE as Value).collect();
+    let size: usize = match args.next().map(|arg| arg.parse()) {
+        Some(Ok(x)) => x,
+        _ => 20,
+    };
+    let frame_duration: u64 = match args.next().map(|arg| arg.parse()) {
+        Some(Ok(x)) => x,
+        _ => 0,
+    };
+
+    let mut list: Vec<_> = (1..=size as Value).collect();
     let mut rng = rand::thread_rng();
     list.shuffle(&mut rng);
 
@@ -28,7 +39,7 @@ fn main() -> io::Result<()> {
 
     for state in iter {
         for (x, value) in state.list.iter().enumerate() {
-            let h = x as f64 * 360.0 / SIZE as f64;
+            let h = x as f64 * 360.0 / size as f64;
             let s = 100.0;
             let l = if state.compare.is_some_and(|[a, b]| a == x || b == x) {
                 100.0
@@ -40,10 +51,10 @@ fn main() -> io::Result<()> {
 
             execute!(io::stdout(), SetForegroundColor(Color::Rgb { r, g, b }))?;
 
-            for y in 0..SIZE {
+            for y in 0..size {
                 execute!(
                     io::stdout(),
-                    cursor::MoveTo(x as u16 * 2, SIZE as u16 - y as u16 - 1)
+                    cursor::MoveTo(x as u16 * 2, size as u16 - y as u16 - 1)
                 )?;
 
                 if y < *value as usize {
@@ -53,11 +64,14 @@ fn main() -> io::Result<()> {
                 }
             }
         }
+
+        io::stdout().flush()?;
+        std::thread::sleep(std::time::Duration::from_millis(frame_duration));
     }
 
     execute!(
         io::stdout(),
-        cursor::MoveTo(0, SIZE as u16),
+        cursor::MoveTo(0, size as u16),
         cursor::Show,
         ResetColor,
     )?;
