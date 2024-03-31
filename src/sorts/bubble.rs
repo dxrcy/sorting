@@ -3,10 +3,7 @@ use generator::Gn;
 
 pub fn bubble(mut list: Vec<u32>) -> impl Iterator<Item = SortState> {
     Gn::new_scoped(move |mut scope| {
-        scope.yield_(SortState {
-            list: list.clone(),
-            just_compared: None,
-        });
+        yield_!(scope, list, None);
 
         for i in 0..list.len() {
             for j in 0..list.len() - i - 1 {
@@ -14,18 +11,11 @@ pub fn bubble(mut list: Vec<u32>) -> impl Iterator<Item = SortState> {
                     list.swap(j, j + 1);
                 }
 
-                scope.yield_(SortState {
-                    list: list.clone(),
-                    just_compared: Some([j, j + 1]),
-                });
+                yield_!(scope, list, [j, j+1]);
             }
         }
 
-        scope.yield_(SortState {
-            list: list.clone(),
-            just_compared: None,
-        });
-
+        yield_!(scope, list, None);
         generator::done()
     })
 }

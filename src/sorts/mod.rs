@@ -1,7 +1,22 @@
-mod selection;
-mod insertion;
-mod bubble;
+macro_rules! yield_ {
+    ($scope:expr, $list:expr, None) => {
+        $scope.yield_(SortState {
+            list: $list.clone(),
+            just_compared: None,
+        })
+    };
+    ($scope:expr, $list:expr, [$($x:expr),*]) => {
+        $scope.yield_(SortState {
+            list: $list.clone(),
+            just_compared: Some([ $($x),* ]),
+        })
+    };
+}
 
-pub use selection::selection;
-pub use insertion::insertion;
+mod bubble;
+mod insertion;
+mod selection;
+
 pub use bubble::bubble;
+pub use insertion::insertion;
+pub use selection::selection;
