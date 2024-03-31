@@ -25,9 +25,8 @@ fn main() -> io::Result<()> {
 
     let iter: Box<dyn Iterator<Item = sorting::SortState>> = match args.algorithm {
         Algorithm::Selection => Box::new(sorts::selection(list)),
-        _ => panic!(),
-        // Algorithm::Insertion => Box::new(sorts::Insertion::new(&mut list)),
-        // Algorithm::Bubble => Box::new(sorts::Bubble::new(&mut list)),
+        Algorithm::Insertion => Box::new(sorts::insertion(list)),
+        Algorithm::Bubble => Box::new(sorts::bubble(list)),
     };
 
     terminal::enable_raw_mode()?;

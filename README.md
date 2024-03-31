@@ -8,7 +8,7 @@ Supported algorithms:
 - Insertion sort
 - Bubble sort
 
-Algorithms must be written as an `Iterator`, so it is rather hard to write (especially for recursive methods).
+Algorithms must be written as an generator function (using the `generator` crate).
 
 ![Screenshot](./screenshot.png)
 

@@ -1,88 +1,36 @@
-use crate::{Compare, SortState, Sorter, Value};
+use crate::SortState;
+use generator::Gn;
 
-#[derive(Debug)]
-pub struct Insertion<'a> {
-    list: &'a mut [Value],
-    i: usize,
-    j: usize,
-    just_compared: Compare,
-}
-
-impl<'a> Iterator for Insertion<'a> {
-    type Item = SortState;
-    fn next(&mut self) -> Option<Self::Item> {
-        Sorter::next(self)
-    }
-}
-
-impl<'a> Insertion<'a> {
-    pub fn new(list: &'a mut [Value]) -> Self {
-        Self {
-            list,
-            i: 1,
-            j: 1,
+pub fn insertion(mut list: Vec<u32>) -> impl Iterator<Item = SortState> {
+    Gn::new_scoped(move |mut scope| {
+        scope.yield_(SortState {
+            list: list.clone(),
             just_compared: None,
-        }
-    }
-}
+        });
 
-impl<'a> Sorter<'a> for Insertion<'a> {
-    fn next(&mut self) -> Option<SortState> {
-        if self.just_compared.is_none() {
-            // this is a bit of a hack
-            // note: `>` vs `>=`
-            if self.i > self.list.len() {
-                return None;
-            }
-            if self.i >= self.list.len() {
-                self.i += 1;
-                return Some(SortState {
-                    list: self.list.to_vec(),
-                    just_compared: None,
-                    did_swap: false,
-                    is_done: true,
+        for i in 1..list.len() {
+            let mut j = i;
+            while j > 0 {
+                scope.yield_(SortState {
+                    list: list.clone(),
+                    just_compared: Some([j - 1, j]),
                 });
+
+                if list[j - 1] < list[j] {
+                    break;
+                }
+
+                list.swap(j, j - 1);
+                j -= 1;
             }
-
-            self.just_compared = Some([0, 0]);
-            return Some(SortState {
-                list: self.list.to_vec(),
-                just_compared: None,
-                did_swap: false,
-                is_done: false,
-            });
         }
 
-        if self.j > 0 {
-            self.just_compared = Some([self.j - 1, self.j]);
-        }
+        scope.yield_(SortState {
+            list: list.clone(),
+            just_compared: None,
+        });
 
-        let mut did_swap = false;
-        if self.j == 0 || self.list[self.j - 1] <= self.list[self.j] {
-            self.i += 1;
-            self.j = self.i;
-        } else {
-            self.list.swap(self.j, self.j - 1);
-            self.j -= 1;
-            did_swap = true;
-        }
-
-        if self.i >= self.list.len() {
-            let just_compared = self.just_compared;
-            self.just_compared = None;
-            return Some(SortState {
-                list: self.list.to_vec(),
-                just_compared,
-                did_swap,
-                is_done: false,
-            });
-        }
-
-        Some(SortState {
-            list: self.list.to_vec(),
-            just_compared: self.just_compared,
-            did_swap,
-            is_done: false,
-        })
-    }
+        generator::done()
+    })
 }
+
