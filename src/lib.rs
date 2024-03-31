@@ -11,8 +11,8 @@ pub type Compare = Option<[usize; 2]>;
 pub struct SortState {
     pub list: Vec<Value>,
     pub just_compared: Compare,
-    pub did_swap: bool,
-    pub is_done: bool,
+    // pub did_swap: bool,
+    // pub is_done: bool,
 }
 
 pub trait Sorter<'a> {
@@ -26,14 +26,14 @@ impl std::fmt::Display for SortState {
         for (i, item) in self.list.iter().enumerate() {
             write!(f, "   ")?;
             if let Some([a, b]) = self.just_compared {
-                let color = if self.did_swap { YELLOW } else { BLUE };
+                // let color = if self.did_swap { YELLOW } else { BLUE };
                 if i == a {
-                    write!(f, "{BRIGHT}{UNDERLINE}{color}")?;
+                    write!(f, "{BRIGHT}{UNDERLINE}{BLUE}")?;
                 } else if i == b {
-                    write!(f, "{BRIGHT}{color}")?;
+                    write!(f, "{BRIGHT}{BLUE}")?;
                 }
-            } else if self.is_done {
-                write!(f, "{BRIGHT}{GREEN}")?;
+            // } else if self.is_done {
+            //     write!(f, "{BRIGHT}{GREEN}")?;
             } else {
                 write!(f, "{RED}")?;
             }

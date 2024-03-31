@@ -1,81 +1,36 @@
-use crate::{Compare, SortState, Sorter, Value};
+use crate::SortState;
+use generator::Gn;
 
-#[derive(Debug)]
-pub struct Selection<'a> {
-    list: &'a mut [Value],
-    i: usize,
-    j: usize,
-    min_index: usize,
-    just_compared: Compare,
-}
-
-impl<'a> Iterator for Selection<'a> {
-    type Item = SortState;
-    fn next(&mut self) -> Option<Self::Item> {
-        Sorter::next(self)
-    }
-}
-
-impl<'a> Selection<'a> {
-    pub fn new(list: &'a mut [Value]) -> Self {
-        Self {
-            list,
-            i: 0,
-            j: 1,
-            min_index: 0,
+pub fn selection(mut list: Vec<u32>) -> impl Iterator<Item = SortState> {
+    Gn::new_scoped(move |mut scope| {
+        scope.yield_(SortState {
+            list: list.clone(),
             just_compared: None,
+        });
+
+        for i in 0..list.len() - 1 {
+            let mut min_index = i;
+
+            for j in i..list.len() {
+                if list[j] < list[min_index] {
+                    min_index = j;
+                }
+
+                scope.yield_(SortState {
+                    list: list.clone(),
+                    just_compared: Some([i, min_index]),
+                });
+            }
+
+            list.swap(i, min_index);
         }
-    }
+
+        scope.yield_(SortState {
+            list: list.clone(),
+            just_compared: None,
+        });
+
+        generator::done()
+    })
 }
 
-impl<'a> Sorter<'a> for Selection<'a> {
-    fn next(&mut self) -> Option<SortState> {
-        if self.i >= self.list.len() - 1 {
-            // return if `None`
-            self.just_compared?;
-
-            self.just_compared = None;
-
-            return Some(SortState {
-                list: self.list.to_vec(),
-                just_compared: None,
-                did_swap: false,
-                is_done: true,
-            });
-        }
-
-        if self.just_compared.is_none() {
-            self.just_compared = Some([0, 0]);
-
-            return Some(SortState {
-                list: self.list.to_vec(),
-                just_compared: None,
-                did_swap: false,
-                is_done: false,
-            });
-        }
-
-        self.just_compared = Some([self.j, self.min_index]);
-        if self.list[self.j] < self.list[self.min_index] {
-            self.min_index = self.j;
-        }
-
-        let mut did_swap = false;
-        self.j += 1;
-        if self.j >= self.list.len() {
-            self.list.swap(self.i, self.min_index);
-            did_swap = true;
-
-            self.i += 1;
-            self.j = self.i + 1;
-            self.min_index = self.i;
-        }
-
-        Some(SortState {
-            list: self.list.to_vec(),
-            just_compared: self.just_compared,
-            did_swap,
-            is_done: false,
-        })
-    }
-}

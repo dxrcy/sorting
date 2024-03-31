@@ -24,15 +24,18 @@ fn main() -> io::Result<()> {
     list.shuffle(&mut rng);
 
     let iter: Box<dyn Iterator<Item = sorting::SortState>> = match args.algorithm {
-        Algorithm::Selection => Box::new(sorts::Selection::new(&mut list)),
-        Algorithm::Insertion => Box::new(sorts::Insertion::new(&mut list)),
-        Algorithm::Bubble => Box::new(sorts::Bubble::new(&mut list)),
+        Algorithm::Selection => Box::new(sorts::selection(list)),
+        _ => panic!(),
+        // Algorithm::Insertion => Box::new(sorts::Insertion::new(&mut list)),
+        // Algorithm::Bubble => Box::new(sorts::Bubble::new(&mut list)),
     };
 
     terminal::enable_raw_mode()?;
     let mut stdout = io::stdout();
 
     execute!(stdout, Clear(ClearType::All), crossterm::cursor::Hide,)?;
+
+    let mut final_list = None;
 
     'sort: for state in iter {
         if event::poll(time::Duration::from_millis(1)).unwrap() {
@@ -80,6 +83,7 @@ fn main() -> io::Result<()> {
                 }
             }
         }
+        final_list = Some(state.list);
 
         if args.frame_duration > 0 {
             thread::sleep(time::Duration::from_millis(args.frame_duration));
@@ -94,7 +98,7 @@ fn main() -> io::Result<()> {
     )?;
     terminal::disable_raw_mode()?;
 
-    if !is_sorted(&list) {
+    if final_list.filter(|list| !is_sorted(&list)).is_some() {
         println!("{BRIGHT}{RED}The list is not sorted.{RESET}");
         process::exit(1);
     }
