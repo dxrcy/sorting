@@ -27,6 +27,7 @@ fn main() -> io::Result<()> {
         Algorithm::Selection => Box::new(sorts::selection(list)),
         Algorithm::Insertion => Box::new(sorts::insertion(list)),
         Algorithm::Bubble => Box::new(sorts::bubble(list)),
+        Algorithm::Quick => Box::new(sorts::quick(list)),
     };
 
     terminal::enable_raw_mode()?;

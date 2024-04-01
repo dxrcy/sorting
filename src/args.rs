@@ -19,6 +19,7 @@ pub enum Algorithm {
     Selection,
     Insertion,
     Bubble,
+    Quick,
 }
 
 impl Display for Algorithm {
