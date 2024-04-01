@@ -1,7 +1,7 @@
-use crate::SortState;
+use crate::{SortState, Value};
 use generator::{done, Gn};
 
-pub fn selection(mut list: Vec<u32>) -> impl Iterator<Item = SortState> {
+pub fn selection(mut list: Vec<Value>) -> impl Iterator<Item = SortState> {
     Gn::new_scoped(move |mut scope| {
         yield_!(scope, list, None);
 

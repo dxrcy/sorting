@@ -1,14 +1,14 @@
-use crate::SortState;
+use crate::{SortState, Value};
 use generator::{done, Gn};
 
-pub fn insertion(mut list: Vec<u32>) -> impl Iterator<Item = SortState> {
+pub fn insertion(mut list: Vec<Value>) -> impl Iterator<Item = SortState> {
     Gn::new_scoped(move |mut scope| {
         yield_!(scope, list, None);
 
         for i in 1..list.len() {
             let mut j = i;
             while j > 0 {
-                yield_!(scope, list, [j-1, j]);
+                yield_!(scope, list, [j - 1, j]);
 
                 if list[j - 1] < list[j] {
                     break;
@@ -23,4 +23,3 @@ pub fn insertion(mut list: Vec<u32>) -> impl Iterator<Item = SortState> {
         done!();
     })
 }
-

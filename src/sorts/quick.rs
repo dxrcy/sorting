@@ -1,7 +1,7 @@
-use crate::SortState;
+use crate::{Value, SortState};
 use generator::{done, Gn, Scope};
 
-pub fn quick(mut list: Vec<u32>) -> impl Iterator<Item = SortState> {
+pub fn quick(mut list: Vec<Value>) -> impl Iterator<Item = SortState> {
     Gn::new_scoped(move |mut scope| {
         if list.is_empty() {
             done!();
@@ -28,7 +28,7 @@ pub fn quick(mut list: Vec<u32>) -> impl Iterator<Item = SortState> {
     })
 }
 
-fn quick_sort_part(scope: &mut Scope<(), SortState>, list: &mut [u32], low: isize, high: isize) {
+fn quick_sort_part(scope: &mut Scope<(), SortState>, list: &mut [Value], low: isize, high: isize) {
     if low < high {
         let p = partition(scope, list, low, high);
         quick_sort_part(scope, list, low, p - 1);
@@ -36,7 +36,7 @@ fn quick_sort_part(scope: &mut Scope<(), SortState>, list: &mut [u32], low: isiz
     }
 }
 
-fn partition(scope: &mut Scope<(), SortState>, list: &mut [u32], low: isize, high: isize) -> isize {
+fn partition(scope: &mut Scope<(), SortState>, list: &mut [Value], low: isize, high: isize) -> isize {
     let pivot = high as usize;
     let mut store_index = low - 1;
     let mut last_index = high;
