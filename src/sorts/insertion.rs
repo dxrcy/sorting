@@ -1,5 +1,5 @@
 use crate::SortState;
-use generator::Gn;
+use generator::{done, Gn};
 
 pub fn insertion(mut list: Vec<u32>) -> impl Iterator<Item = SortState> {
     Gn::new_scoped(move |mut scope| {
@@ -20,7 +20,7 @@ pub fn insertion(mut list: Vec<u32>) -> impl Iterator<Item = SortState> {
         }
 
         yield_!(scope, list, None);
-        generator::done()
+        done!();
     })
 }
 
