@@ -98,7 +98,7 @@ fn main() -> io::Result<()> {
     )?;
     terminal::disable_raw_mode()?;
 
-    if final_list.filter(|list| !is_sorted(&list)).is_some() {
+    if final_list.filter(|list| !is_sorted(list)).is_some() {
         println!("{BRIGHT}{RED}The list is not sorted.{RESET}");
         process::exit(1);
     }

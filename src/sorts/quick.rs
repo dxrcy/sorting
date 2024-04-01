@@ -89,7 +89,7 @@ fn partition(scope: &mut Scope<(), SortState>, list: &mut [Value], low: isize, h
         list.swap(store_index as usize, last_index as usize);
     }
 
-    list.swap(store_index as usize, pivot as usize);
+    list.swap(store_index as usize, pivot);
 
     store_index
 }
