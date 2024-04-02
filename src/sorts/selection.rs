@@ -6,7 +6,7 @@ use generator::{done, Gn};
 /// Trust me.
 pub unsafe fn selection(list: *mut [Value]) -> impl Iterator<Item = Compare> {
     Gn::new_scoped_local(move |mut scope| {
-        unsafe { scope.yield_unsafe(None) };
+        yield_!(scope, None);
 
         let list = unsafe { &mut *list };
 
@@ -14,17 +14,16 @@ pub unsafe fn selection(list: *mut [Value]) -> impl Iterator<Item = Compare> {
             let mut min_index = i;
 
             for j in i..list.len() {
+                yield_!(scope, [i, min_index]);
                 if list[j] < list[min_index] {
                     min_index = j;
                 }
-
-                unsafe { scope.yield_unsafe(Some([i, min_index])) };
             }
 
             list.swap(i, min_index);
         }
 
-        unsafe { scope.yield_unsafe(None) };
+        yield_!(scope, None);
 
         done!();
     })

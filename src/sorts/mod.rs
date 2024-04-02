@@ -1,17 +1,11 @@
-// macro_rules! yield_ {
-//     ($scope:expr, $list:expr, None) => {
-//         $scope.yield_(SortState {
-//             list: $list.clone(),
-//             just_compared: None,
-//         })
-//     };
-//     ($scope:expr, $list:expr, [$($x:expr),*]) => {
-//         $scope.yield_(SortState {
-//             list: $list.clone(),
-//             just_compared: Some([ $($x),* ]),
-//         })
-//     };
-// }
+macro_rules! yield_ {
+    ($scope:expr, None) => {
+        unsafe { $scope.yield_unsafe(None) };
+    };
+    ($scope:expr, [$($x:expr),*]) => {
+        unsafe { $scope.yield_unsafe(Some( [$($x),*] )) };
+    };
+}
 
 // mod bubble;
 // mod insertion;
