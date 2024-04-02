@@ -1,9 +1,14 @@
-use crate::{SortState, Value};
+use crate::{Compare, Value};
 use generator::{done, Gn};
 
-pub fn selection(mut list: Vec<Value>) -> impl Iterator<Item = SortState> {
-    Gn::new_scoped(move |mut scope| {
-        yield_!(scope, list, None);
+/// # Safety
+///
+/// Trust me.
+pub unsafe fn selection(list: *mut [Value]) -> impl Iterator<Item = Compare> {
+    Gn::new_scoped_local(move |mut scope| {
+        unsafe { scope.yield_unsafe(None) };
+
+        let list = unsafe { &mut *list };
 
         for i in 0..list.len() - 1 {
             let mut min_index = i;
@@ -12,13 +17,15 @@ pub fn selection(mut list: Vec<Value>) -> impl Iterator<Item = SortState> {
                 if list[j] < list[min_index] {
                     min_index = j;
                 }
-                yield_!(scope, list, [i, min_index]);
+
+                unsafe { scope.yield_unsafe(Some([i, min_index])) };
             }
 
             list.swap(i, min_index);
         }
 
-        yield_!(scope, list, None);
+        unsafe { scope.yield_unsafe(None) };
+
         done!();
     })
 }

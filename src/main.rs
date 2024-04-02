@@ -23,11 +23,14 @@ fn main() -> io::Result<()> {
     let mut rng = rand::thread_rng();
     list.shuffle(&mut rng);
 
-    let iter: Box<dyn Iterator<Item = sorting::SortState>> = match args.algorithm {
-        Algorithm::Selection => Box::new(sorts::selection(list)),
-        Algorithm::Insertion => Box::new(sorts::insertion(list)),
-        Algorithm::Bubble => Box::new(sorts::bubble(list)),
-        Algorithm::Quick => Box::new(sorts::quick(list)),
+    let ptr = list.as_mut_slice() as *mut [u32];
+
+    let iter: Box<dyn Iterator<Item = sorting::Compare>> = match args.algorithm {
+        Algorithm::Selection => Box::new(unsafe { sorts::selection(ptr)} ),
+        _ => todo!(),
+        // Algorithm::Insertion => Box::new(sorts::insertion(list)),
+        // Algorithm::Bubble => Box::new(sorts::bubble(list)),
+        // Algorithm::Quick => Box::new(sorts::quick(list)),
     };
 
     terminal::enable_raw_mode()?;
@@ -35,9 +38,7 @@ fn main() -> io::Result<()> {
 
     execute!(stdout, Clear(ClearType::All), crossterm::cursor::Hide,)?;
 
-    let mut final_list = None;
-
-    'sort: for state in iter {
+    'sort: for compare in iter {
         if event::poll(time::Duration::from_millis(1)).unwrap() {
             if let Ok(event) = event::read() {
                 match event {
@@ -57,10 +58,10 @@ fn main() -> io::Result<()> {
             }
         }
 
-        for (x, value) in state.list.iter().enumerate() {
+        for (x, value) in list.iter().enumerate() {
             let h = *value as f64 * 360.0 / size as f64;
             let s = 100.0;
-            let l = if state.just_compared.is_some_and(|[a, b]| a == x || b == x) {
+            let l = if compare.is_some_and(|[a, b]| a == x || b == x) {
                 100.0
             } else {
                 50.0
@@ -83,7 +84,6 @@ fn main() -> io::Result<()> {
                 }
             }
         }
-        final_list = Some(state.list);
 
         if args.frame_duration > 0 {
             thread::sleep(time::Duration::from_millis(args.frame_duration));
@@ -98,7 +98,7 @@ fn main() -> io::Result<()> {
     )?;
     terminal::disable_raw_mode()?;
 
-    if final_list.filter(|list| !is_sorted(list)).is_some() {
+    if !is_sorted(&list) {
         println!("{BRIGHT}{RED}The list is not sorted.{RESET}");
         process::exit(1);
     }
