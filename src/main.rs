@@ -28,8 +28,9 @@ fn main() -> io::Result<()> {
     let iter: Box<dyn Iterator<Item = sorting::Compare>> = match args.algorithm {
         Algorithm::Bubble => Box::new(sorts::bubble(ptr)),
         Algorithm::Insertion => Box::new(sorts::insertion(ptr)),
-        Algorithm::Selection => Box::new(sorts::selection(ptr)),
+        Algorithm::Merge => Box::new(sorts::merge(ptr)),
         Algorithm::Quick => Box::new(sorts::quick(ptr)),
+        Algorithm::Selection => Box::new(sorts::selection(ptr)),
     };
 
     terminal::enable_raw_mode()?;

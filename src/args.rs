@@ -16,10 +16,11 @@ pub struct Args {
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
 pub enum Algorithm {
-    Selection,
-    Insertion,
     Bubble,
+    Insertion,
+    Merge,
     Quick,
+    Selection,
 }
 
 impl Display for Algorithm {

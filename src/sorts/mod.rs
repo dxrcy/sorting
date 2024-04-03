@@ -26,10 +26,13 @@ macro_rules! yield_ {
 
 mod bubble;
 mod insertion;
+mod merge;
 mod quick;
 mod selection;
 
 pub use bubble::bubble;
 pub use insertion::insertion;
+pub use merge::merge;
 pub use quick::quick;
 pub use selection::selection;
+
