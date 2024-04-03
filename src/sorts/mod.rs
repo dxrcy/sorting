@@ -1,3 +1,23 @@
+macro_rules! algorithm {
+    (
+        $name:ident : | $list:ident, $scope:ident |
+        { $($body:tt)* }
+    ) => {
+        use crate::{Compare, Value};
+
+        /// # Safety
+        ///
+        /// Trust me.
+        pub unsafe fn $name($list: *mut [Value]) -> impl Iterator<Item = Compare> {
+            generator::Gn::new_scoped_local(move |mut $scope| {
+                let $list = unsafe { &mut *$list };
+                $($body)*
+                generator::done()
+            })
+        }
+    };
+}
+
 macro_rules! yield_ {
     ($scope:expr, None) => {
         unsafe { $scope.yield_unsafe(None) };
