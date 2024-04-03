@@ -18,7 +18,7 @@ fn main() -> io::Result<()> {
     let args = Args::parse();
 
     let size = args.size;
-    let height = args.size;
+    let height = args.size / 2;
 
     let mut list: Vec<_> = (1..=size as Value).collect();
     let mut rng = rand::thread_rng();
@@ -75,15 +75,19 @@ fn main() -> io::Result<()> {
             for y in 0..height {
                 queue!(
                     stdout,
-                    cursor::MoveTo(x as u16 * 3, height as u16 - y as u16 - 1)
+                    cursor::MoveTo(x as u16 * 2, height as u16 - y as u16 - 1)
                 )?;
 
-                if y + 1 > *value as usize {
-                    print!("   ");
-                } else if y + 1 == *value as usize {
-                    print!("🭈🭆🭂");
+                // Signed distance to top of block
+                let distance = *value as isize / 2 - y as isize;
+                let is_odd = value % 2 == 1;
+
+                if distance > 0 {
+                    print!("\u{2588}\u{2588}"); // Full block
+                } else if distance == 0 && is_odd {
+                    print!("\u{2584}\u{2584}"); // Half block
                 } else {
-                    print!("\u{2588}\u{2588}\u{2588}");
+                    print!("  "); // Blank
                 }
             }
         }
