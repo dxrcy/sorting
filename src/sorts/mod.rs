@@ -29,10 +29,10 @@ macro_rules! yield_ {
 
 mod bubble;
 mod insertion;
+mod quick;
 mod selection;
-// mod quick;
 
 pub use bubble::bubble;
 pub use insertion::insertion;
+pub use quick::quick;
 pub use selection::selection;
-// pub use quick::quick;

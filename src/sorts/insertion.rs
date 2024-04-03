@@ -1,4 +1,4 @@
-algorithm!( insertion: |list, scope| {
+algorithm!(insertion: |list, scope| {
     yield_!(scope, None);
 
     for i in 1..list.len() {

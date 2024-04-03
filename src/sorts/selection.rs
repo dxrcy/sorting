@@ -1,4 +1,4 @@
-algorithm!( selection: |list, scope| {
+algorithm!(selection: |list, scope| {
     yield_!(scope, None);
 
     for i in 0..list.len() - 1 {

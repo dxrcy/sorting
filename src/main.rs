@@ -29,8 +29,7 @@ fn main() -> io::Result<()> {
         Algorithm::Selection => Box::new(unsafe { sorts::selection(ptr) }),
         Algorithm::Insertion => Box::new(unsafe { sorts::insertion(ptr) }),
         Algorithm::Bubble => Box::new(unsafe { sorts::bubble(ptr) }),
-        _ => todo!(),
-        // Algorithm::Quick => Box::new(sorts::quick(list)),
+        Algorithm::Quick => Box::new(unsafe { sorts::quick(ptr) }),
     };
 
     terminal::enable_raw_mode()?;
