@@ -3,11 +3,12 @@ macro_rules! algorithm {
         $name:ident : | $list:ident, $scope:ident |
         { $($body:tt)* }
     ) => {
-        use crate::{Compare, Value};
+        #[allow(unused_imports)]
+        use crate::{Compare, SmartPointer, Value};
 
-        pub fn $name($list: *mut [Value]) -> generator::LocalGenerator<'static, (), Compare> {
+        pub fn $name(mut $list: SmartPointer) -> generator::LocalGenerator<'static, (), Compare> {
             generator::Gn::new_scoped_local(move |mut $scope| {
-                let $list = unsafe { &mut *$list };
+                let $list = $list.as_mut_slice();
                 $($body)*
                 generator::done()
             })

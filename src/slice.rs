@@ -17,13 +17,6 @@ impl<'a> Slice<'a> {
     pub fn new(whole: &'a [u32], start: usize, end: usize) -> Self {
         Self { whole, start, end }
     }
-    // pub fn from(whole: &'a [u32]) -> Self {
-    //     Self {
-    //         whole,
-    //         start: 0,
-    //         end: whole.len(),
-    //     }
-    // }
 
     pub fn with_bounds(&self, start: usize, end: usize) -> Self {
         Self {
@@ -43,9 +36,6 @@ impl<'a> Slice<'a> {
     pub fn start(&self) -> usize {
         self.start
     }
-    // pub fn end(&self) -> usize {
-    //     self.end
-    // }
 }
 
 impl<'a> SliceMut<'a> {
@@ -58,12 +48,6 @@ impl<'a> SliceMut<'a> {
     }
     pub fn get_whole_mut(&mut self) -> &mut [u32] {
         self.whole
-    }
-
-    pub fn with_bounds<'b: 'a>(&'b mut self, start: usize, end: usize) -> Self {
-        let old_start = self.start;
-        let whole = &mut self.whole;
-        Self::new(whole, old_start + start, old_start + end)
     }
 
     pub fn as_slice(&self) -> &[Value] {

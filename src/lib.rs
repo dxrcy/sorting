@@ -8,6 +8,19 @@ mod tests;
 pub type Value = u32;
 pub type Compare = Option<[usize; 2]>;
 
+pub struct SmartPointer(*mut [Value]);
+
+impl SmartPointer {
+    pub fn new(list: &mut [Value]) -> Self {
+        Self(list as *mut [Value])
+    }
+
+    pub fn as_mut_slice(&mut self) -> &mut [Value] {
+        unsafe { &mut *self.0 }
+    }
+}
+
+
 pub fn is_sorted(list: &[Value]) -> bool {
     if list.is_empty() {}
     for i in 0..list.len() - 1 {
