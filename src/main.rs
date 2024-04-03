@@ -27,9 +27,9 @@ fn main() -> io::Result<()> {
 
     let iter: Box<dyn Iterator<Item = sorting::Compare>> = match args.algorithm {
         Algorithm::Selection => Box::new(unsafe { sorts::selection(ptr) }),
+        Algorithm::Insertion => Box::new(unsafe { sorts::insertion(ptr) }),
         Algorithm::Bubble => Box::new(unsafe { sorts::bubble(ptr) }),
         _ => todo!(),
-        // Algorithm::Insertion => Box::new(sorts::insertion(list)),
         // Algorithm::Quick => Box::new(sorts::quick(list)),
     };
 

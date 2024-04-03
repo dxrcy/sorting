@@ -1,25 +1,19 @@
-use crate::{SortState, Value};
-use generator::{done, Gn};
+algorithm!( insertion: |list, scope| {
+    yield_!(scope, None);
 
-pub fn insertion(mut list: Vec<Value>) -> impl Iterator<Item = SortState> {
-    Gn::new_scoped(move |mut scope| {
-        yield_!(scope, list, None);
+    for i in 1..list.len() {
+        let mut j = i;
+        while j > 0 {
+            yield_!(scope, [j - 1, j]);
 
-        for i in 1..list.len() {
-            let mut j = i;
-            while j > 0 {
-                yield_!(scope, list, [j - 1, j]);
-
-                if list[j - 1] < list[j] {
-                    break;
-                }
-
-                list.swap(j, j - 1);
-                j -= 1;
+            if list[j - 1] < list[j] {
+                break;
             }
-        }
 
-        yield_!(scope, list, None);
-        done!();
-    })
-}
+            list.swap(j, j - 1);
+            j -= 1;
+        }
+    }
+
+    yield_!(scope, None);
+});
