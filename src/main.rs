@@ -12,7 +12,7 @@ use rand::seq::SliceRandom;
 use std::{io, process, thread, time};
 
 use args::{Algorithm, Args};
-use sorting::{colors::*, sorts, Value};
+use sorting::{colors::*, hsl_to_rgb, is_sorted, sorts, Value};
 
 fn main() -> io::Result<()> {
     let args = Args::parse();
@@ -26,9 +26,9 @@ fn main() -> io::Result<()> {
     let ptr = list.as_mut_slice() as *mut [u32];
 
     let iter: Box<dyn Iterator<Item = sorting::Compare>> = match args.algorithm {
-        Algorithm::Selection => Box::new(unsafe { sorts::selection(ptr) }),
-        Algorithm::Insertion => Box::new(unsafe { sorts::insertion(ptr) }),
         Algorithm::Bubble => Box::new(unsafe { sorts::bubble(ptr) }),
+        Algorithm::Insertion => Box::new(unsafe { sorts::insertion(ptr) }),
+        Algorithm::Selection => Box::new(unsafe { sorts::selection(ptr) }),
         Algorithm::Quick => Box::new(unsafe { sorts::quick(ptr) }),
     };
 
@@ -103,43 +103,4 @@ fn main() -> io::Result<()> {
     }
 
     Ok(())
-}
-
-fn is_sorted(list: &[Value]) -> bool {
-    for i in 0..list.len() - 1 {
-        if list[i] > list[i + 1] {
-            return false;
-        }
-    }
-    true
-}
-
-pub fn hsl_to_rgb(mut h: f64, mut s: f64, mut l: f64) -> (u8, u8, u8) {
-    h /= 360.0;
-    s /= 100.0;
-    l /= 100.0;
-
-    let c = (1.0 - (2.0 * l - 1.0).abs()) * s;
-    let x = c * (1.0 - ((h * 6.0) % 2.0 - 1.0).abs());
-    let m = l - c / 2.0;
-
-    let (r, g, b) = if h < 1.0 / 6.0 {
-        (c, x, 0.0)
-    } else if h < 2.0 / 6.0 {
-        (x, c, 0.0)
-    } else if h < 3.0 / 6.0 {
-        (0.0, c, x)
-    } else if h < 4.0 / 6.0 {
-        (0.0, x, c)
-    } else if h < 5.0 / 6.0 {
-        (x, 0.0, c)
-    } else {
-        (c, 0.0, x)
-    };
-
-    let r = ((r + m) * 255.0).round() as u8;
-    let g = ((g + m) * 255.0).round() as u8;
-    let b = ((b + m) * 255.0).round() as u8;
-
-    (r, g, b)
 }

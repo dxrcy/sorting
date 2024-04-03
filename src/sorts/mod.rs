@@ -5,10 +5,7 @@ macro_rules! algorithm {
     ) => {
         use crate::{Compare, Value};
 
-        /// # Safety
-        ///
-        /// Trust me.
-        pub unsafe fn $name($list: *mut [Value]) -> impl Iterator<Item = Compare> {
+        pub fn $name($list: *mut [Value]) -> generator::LocalGenerator<'static, (), Compare> {
             generator::Gn::new_scoped_local(move |mut $scope| {
                 let $list = unsafe { &mut *$list };
                 $($body)*

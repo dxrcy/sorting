@@ -1,5 +1,11 @@
+use generator::done;
+
 algorithm!(selection: |list, scope| {
     yield_!(scope, None);
+
+    if list.len() <= 1 {
+        done!();
+    }
 
     for i in 0..list.len() - 1 {
         let mut min_index = i;
