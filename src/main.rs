@@ -17,8 +17,16 @@ use sorting::{colors::*, hsl_to_rgb, is_sorted, sorts, Compare, ListRef, Value};
 fn main() -> io::Result<()> {
     let args = Args::parse();
 
-    let size = args.size;
-    let height = args.size / 2;
+    let size = args.size.unwrap_or_else(|| {
+        let (mut width, mut height) = terminal::size().unwrap();
+        width /= 2; // 2 columns per value
+        height -= 3; // Account for prompt height after completed
+        if height * 2 < width {
+            width = height * 2;
+        }
+        width as usize
+    });
+    let height = (size + 1) / 2;
 
     let mut list: Vec<_> = (1..=size as Value).collect();
     let mut rng = rand::thread_rng();
@@ -70,12 +78,19 @@ fn main() -> io::Result<()> {
 
             let (r, g, b) = hsl_to_rgb(h, s, l);
 
-            queue!(stdout, SetForegroundColor(Color::Rgb { r, g, b }))?;
+            queue!(
+                stdout,
+                SetForegroundColor(Color::Rgb { r, g, b }),
+                // Move to bottom of printed area
+                cursor::MoveToRow(height as u16),
+            )?;
 
             for y in 0..height {
                 queue!(
                     stdout,
-                    cursor::MoveTo(x as u16 * 2, height as u16 - y as u16 - 1)
+                    // Re-align to column (print moves cursor)
+                    cursor::MoveToColumn(x as u16 * 2),
+                    cursor::MoveUp(1),
                 )?;
 
                 // Signed distance to top of block
@@ -92,8 +107,8 @@ fn main() -> io::Result<()> {
             }
         }
 
-        if args.frame_duration > 0 {
-            thread::sleep(time::Duration::from_millis(args.frame_duration));
+        if args.delay > 0 {
+            thread::sleep(time::Duration::from_millis(args.delay));
         }
     }
 
