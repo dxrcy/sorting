@@ -27,12 +27,12 @@ macro_rules! yield_ {
     };
 }
 
-// mod bubble;
+mod bubble;
 // mod insertion;
 mod selection;
 // mod quick;
 
-// pub use bubble::bubble;
+pub use bubble::bubble;
 // pub use insertion::insertion;
 pub use selection::selection;
 // pub use quick::quick;

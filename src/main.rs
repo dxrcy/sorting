@@ -26,10 +26,10 @@ fn main() -> io::Result<()> {
     let ptr = list.as_mut_slice() as *mut [u32];
 
     let iter: Box<dyn Iterator<Item = sorting::Compare>> = match args.algorithm {
-        Algorithm::Selection => Box::new(unsafe { sorts::selection(ptr)} ),
+        Algorithm::Selection => Box::new(unsafe { sorts::selection(ptr) }),
+        Algorithm::Bubble => Box::new(unsafe { sorts::bubble(ptr) }),
         _ => todo!(),
         // Algorithm::Insertion => Box::new(sorts::insertion(list)),
-        // Algorithm::Bubble => Box::new(sorts::bubble(list)),
         // Algorithm::Quick => Box::new(sorts::quick(list)),
     };
 
