@@ -4,9 +4,9 @@ macro_rules! algorithm {
         { $($body:tt)* }
     ) => {
         #[allow(unused_imports)]
-        use crate::{Compare, SmartPointer, Value};
+        use crate::{Compare, ListRef, Value};
 
-        pub fn $name(mut $list: SmartPointer) -> generator::LocalGenerator<'static, (), Compare> {
+        pub fn $name(mut $list: ListRef) -> generator::LocalGenerator<'static, (), Compare> {
             generator::Gn::new_scoped_local(move |mut $scope| {
                 let $list = $list.as_mut_slice();
                 $($body)*

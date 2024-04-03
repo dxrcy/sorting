@@ -12,7 +12,7 @@ use rand::seq::SliceRandom;
 use std::{io, process, thread, time};
 
 use args::{Algorithm, Args};
-use sorting::{colors::*, hsl_to_rgb, is_sorted, sorts, SmartPointer, Value};
+use sorting::{colors::*, hsl_to_rgb, is_sorted, sorts, Compare, ListRef, Value};
 
 fn main() -> io::Result<()> {
     let args = Args::parse();
@@ -23,9 +23,9 @@ fn main() -> io::Result<()> {
     let mut rng = rand::thread_rng();
     list.shuffle(&mut rng);
 
-    let ptr = SmartPointer::new(&mut list);
+    let ptr = ListRef::from(&mut list);
 
-    let iter: Box<dyn Iterator<Item = sorting::Compare>> = match args.algorithm {
+    let iter: Box<dyn Iterator<Item = Compare>> = match args.algorithm {
         Algorithm::Bubble => Box::new(sorts::bubble(ptr)),
         Algorithm::Insertion => Box::new(sorts::insertion(ptr)),
         Algorithm::Merge => Box::new(sorts::merge(ptr)),
