@@ -30,11 +30,18 @@ impl<'a> Slice<'a> {
         &self.whole[self.start..self.end]
     }
 
+    pub fn start(&self) -> usize {
+        self.start
+    }
+    pub fn end(&self) -> usize {
+        self.end
+    }
+
     pub fn len(&self) -> usize {
         self.end - self.start
     }
-    pub fn start(&self) -> usize {
-        self.start
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 }
 
@@ -57,14 +64,18 @@ impl<'a> SliceMut<'a> {
         &mut self.whole[self.start..self.end]
     }
 
-    pub fn len(&self) -> usize {
-        self.end - self.start
-    }
     pub fn start(&self) -> usize {
         self.start
     }
     pub fn end(&self) -> usize {
         self.end
+    }
+
+    pub fn len(&self) -> usize {
+        self.end - self.start
+    }
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 }
 

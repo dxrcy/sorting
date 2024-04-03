@@ -19,9 +19,10 @@ impl ListRef {
     }
 }
 
-
 pub fn is_sorted(list: &[Value]) -> bool {
-    if list.is_empty() {}
+    if list.is_empty() {
+        return true;
+    }
     for i in 0..list.len() - 1 {
         if list[i] > list[i + 1] {
             return false;
