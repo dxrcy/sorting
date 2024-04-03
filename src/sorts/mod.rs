@@ -16,10 +16,10 @@ macro_rules! algorithm {
 }
 
 macro_rules! yield_ {
-    ($scope:expr, None) => {
+    ($scope:expr, None $(,)?) => {
         unsafe { $scope.yield_unsafe(None) };
     };
-    ($scope:expr, [$($x:expr),*]) => {
+    ($scope:expr, [$($x:expr),*] $(,)?) => {
         unsafe { $scope.yield_unsafe(Some( [$($x),*] )) };
     };
 }
@@ -35,4 +35,3 @@ pub use insertion::insertion;
 pub use merge::merge;
 pub use quick::quick;
 pub use selection::selection;
-

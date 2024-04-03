@@ -1,13 +1,13 @@
-use crate::Slice;
+use crate::slice::{Slice, SliceMut};
 use generator::Scope;
 
 algorithm!(merge: |list, scope| {
     yield_!(scope, None);
-    merge_sort(&mut scope, list);
+    merge_sort(&mut scope, SliceMut::new(list, 0, list.len()));
     yield_!(scope, None);
 });
 
-fn merge_sort(scope: &mut Scope<(), Compare>, list: &mut [Value]) {
+fn merge_sort(scope: &mut Scope<(), Compare>, mut list: SliceMut) {
     let len = list.len();
     let midpoint = len / 2;
 
@@ -15,17 +15,25 @@ fn merge_sort(scope: &mut Scope<(), Compare>, list: &mut [Value]) {
         return;
     }
 
-    merge_sort(scope, &mut list[0..midpoint]);
-    merge_sort(scope, &mut list[midpoint..len]);
+    let start = list.start();
 
-    let mut aux = list.to_vec();
+    merge_sort(
+        scope,
+        SliceMut::new(list.get_whole_mut(), start, start + midpoint),
+    );
+    merge_sort(
+        scope,
+        SliceMut::new(list.get_whole_mut(), start + midpoint, start + len),
+    );
 
-    let left = Slice::new(&list, 0, midpoint);
-    let right = Slice::new(&list, midpoint, len);
+    let mut aux = list.as_slice().to_vec();
+
+    let left = Slice::new(list.get_whole(), start, start + midpoint);
+    let right = Slice::new(list.get_whole(), start + midpoint, start + len);
 
     merge_part(scope, left, right, aux.as_mut_slice());
 
-    list.copy_from_slice(&aux);
+    list.as_mut_slice().copy_from_slice(&aux);
 }
 
 fn merge_part(scope: &mut Scope<(), Compare>, left: Slice, right: Slice, aux: &mut [Value]) {
@@ -36,12 +44,10 @@ fn merge_part(scope: &mut Scope<(), Compare>, left: Slice, right: Slice, aux: &m
     let mut aux_index = 0;
 
     while left_index < left.len() && right_index < right.len() {
-        unsafe {
-            scope.yield_unsafe(Some([
-                left.start() + left_index,
-                right.start() + right_index,
-            ]));
-        }
+        yield_!(
+            scope,
+            [left.start() + left_index, right.start() + right_index]
+        );
 
         if left[left_index] < right[right_index] {
             aux[aux_index] = left[left_index];

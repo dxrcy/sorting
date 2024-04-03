@@ -1,11 +1,11 @@
 pub mod colors;
+pub mod slice;
 pub mod sorts;
 
 #[cfg(test)]
 mod tests;
 
 pub type Value = u32;
-
 pub type Compare = Option<[usize; 2]>;
 
 pub fn is_sorted(list: &[Value]) -> bool {
@@ -46,58 +46,4 @@ pub fn hsl_to_rgb(mut h: f64, mut s: f64, mut l: f64) -> (u8, u8, u8) {
     let b = ((b + m) * 255.0).round() as u8;
 
     (r, g, b)
-}
-
-struct Slice<'a> {
-    whole: &'a [u32],
-    start: usize,
-    end: usize,
-}
-
-impl<'a> Slice<'a> {
-    pub fn new(whole: &'a [u32], start: usize, end: usize) -> Slice<'a> {
-        Slice { whole, start, end }
-    }
-    pub fn as_slice(&self) -> &[Value] {
-        &self.whole[self.start..self.end]
-    }
-    pub fn len(&self) -> usize {
-        self.end - self.start
-    }
-    pub fn start(&self) -> usize {
-        self.start
-    }
-    // pub fn end(&self) -> usize {
-    //     self.end
-    // }
-}
-
-macro_rules! impl_range {
-    ( $( $ty:ty ),* $(,)? ) => {
-        $(
-            impl<'a> Index<$ty> for Slice<'a> {
-                type Output = [Value];
-                fn index(&self, index: $ty) -> &Self::Output {
-                    &self.as_slice()[index]
-                }
-            }
-        )*
-    };
-}
-
-use std::ops::*;
-impl_range![
-    RangeFull,               // [..]
-    Range<usize>,            // [x..y]
-    RangeInclusive<usize>,   // [x..=y]
-    RangeTo<usize>,          // [..x]
-    RangeToInclusive<usize>, // [..=x]
-    RangeFrom<usize>,        // [x..]
-];
-
-impl<'a> Index<usize> for Slice<'a> {
-    type Output = Value;
-    fn index(&self, index: usize) -> &Self::Output {
-        &self.as_slice()[index]
-    }
 }
