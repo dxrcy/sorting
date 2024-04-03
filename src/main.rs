@@ -18,6 +18,7 @@ fn main() -> io::Result<()> {
     let args = Args::parse();
 
     let size = args.size;
+    let height = args.size;
 
     let mut list: Vec<_> = (1..=size as Value).collect();
     let mut rng = rand::thread_rng();
@@ -71,16 +72,18 @@ fn main() -> io::Result<()> {
 
             queue!(stdout, SetForegroundColor(Color::Rgb { r, g, b }))?;
 
-            for y in 0..size {
+            for y in 0..height {
                 queue!(
                     stdout,
-                    cursor::MoveTo(x as u16 * 2, size as u16 - y as u16 - 1)
+                    cursor::MoveTo(x as u16 * 3, height as u16 - y as u16 - 1)
                 )?;
 
-                if y < *value as usize {
-                    print!("{}", "\u{2588}".repeat(2));
+                if y + 1 > *value as usize {
+                    print!("   ");
+                } else if y + 1 == *value as usize {
+                    print!("🭈🭆🭂");
                 } else {
-                    print!("  ");
+                    print!("\u{2588}\u{2588}\u{2588}");
                 }
             }
         }
@@ -92,7 +95,7 @@ fn main() -> io::Result<()> {
 
     execute!(
         stdout,
-        cursor::MoveTo(0, size as u16),
+        cursor::MoveTo(0, height as u16),
         cursor::Show,
         ResetColor,
     )?;
