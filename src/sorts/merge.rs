@@ -15,13 +15,13 @@ fn merge_sort(scope: &mut Scope<(), Compare>, mut list: SliceMut) {
         return;
     }
 
-    merge_sort(scope, slice!(&mut list[0..midpoint]));
-    merge_sort(scope, slice!(&mut list[midpoint..len]));
+    merge_sort(scope, slice!(&mut list, 0, midpoint));
+    merge_sort(scope, slice!(&mut list, midpoint, len));
 
     let mut aux = list.as_slice().to_vec();
 
-    let left = slice!(&list[0..midpoint]);
-    let right = slice!(&list[midpoint..len]);
+    let left = slice!(&list, 0, midpoint);
+    let right = slice!(&list, midpoint, len);
 
     merge_part(scope, left, right, aux.as_mut_slice());
 

@@ -27,11 +27,11 @@ macro_rules! yield_ {
 
 // Wrapper for subslicing a `Slice` or `SliceMut` to preserve original whole slice
 macro_rules! slice {
-    ( & $list:ident [ $start:tt .. $end:tt ] ) => {{
+    ( & $list:ident, $start:expr, $end:expr ) => {{
         let start = $list.start();
         Slice::new($list.get_whole(), start + $start, start + $end)
     }};
-    ( &mut $list:ident [ $start:tt .. $end:tt ] ) => {{
+    ( &mut $list:ident, $start:expr, $end:expr ) => {{
         let start = $list.start();
         SliceMut::new($list.get_whole_mut(), start + $start, start + $end)
     }};

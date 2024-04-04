@@ -1,68 +1,46 @@
+use crate::slice::SliceMut;
 use generator::{done, Scope};
 
 algorithm!(quick: |list, scope| {
+    yield_!(scope, None);
+
     if list.is_empty() {
         done!();
     }
-
-    yield_!(scope, None);
-
-    let len = list.len();
-    quick_sort_part(&mut scope, list, 0, (len - 1) as isize);
+    quick_part(&mut scope, SliceMut::from(list));
 
     yield_!(scope, None);
 });
 
-fn quick_sort_part(scope: &mut Scope<(), Compare>, list: &mut [Value], low: isize, high: isize) {
-    if low < high {
-        let p = partition(scope, list, low, high);
-        quick_sort_part(scope, list, low, p - 1);
-        quick_sort_part(scope, list, p + 1, high);
+fn quick_part(scope: &mut Scope<(), Compare>, mut list: SliceMut) {
+    let len = list.len();
+    if len <= 1 {
+        return;
     }
+
+    let pivot_index = partition(scope, &mut list);
+    quick_part(scope, slice!(&mut list, 0, pivot_index));
+    quick_part(scope, slice!(&mut list, pivot_index + 1, len));
 }
 
-fn partition(scope: &mut Scope<(), Compare>, list: &mut [Value], low: isize, high: isize) -> isize {
-    let pivot = high as usize;
-    let mut store_index = low - 1;
-    let mut last_index = high;
+fn partition(scope: &mut Scope<(), Compare>, list: &mut SliceMut) -> usize {
+    let len = list.len();
 
-    loop {
-        store_index += 1;
-        loop {
-            yield_!(scope, [store_index as usize, pivot]);
+    let pivot_index = len / 2;
 
-            if list[store_index as usize] >= list[pivot] {
-                break;
-            }
-            store_index += 1;
+    list.as_mut_slice().swap(pivot_index, len - 1);
+
+    let mut i = 0;
+    for j in 0..list.len() - 1 {
+        yield_!(scope, [list.start() + j, list.start() + len - 1]);
+
+        if list[j] < list[len - 1] {
+            list.as_mut_slice().swap(i, j);
+            i += 1;
         }
-
-        last_index -= 1;
-        loop {
-            if last_index < 0 {
-                break;
-            }
-
-            yield_!(scope, [last_index as usize, pivot]);
-
-            if list[last_index as usize] <= list[pivot] {
-                break;
-            }
-            last_index -= 1;
-        }
-
-        if last_index >= 0 {
-            yield_!(scope, [store_index as usize, last_index as usize]);
-        }
-
-        if store_index >= last_index {
-            break;
-        }
-
-        list.swap(store_index as usize, last_index as usize);
     }
 
-    list.swap(store_index as usize, pivot);
+    list.as_mut_slice().swap(i, len - 1);
 
-    store_index
+    i
 }

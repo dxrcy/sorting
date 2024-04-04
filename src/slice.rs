@@ -75,6 +75,27 @@ impl<'a> SliceMut<'a> {
     }
 }
 
+impl<'a> From<&'a [Value]> for Slice<'a> {
+    fn from(whole: &'a [Value]) -> Self {
+        let end = whole.len();
+        Self {
+            whole,
+            start: 0,
+            end,
+        }
+    }
+}
+impl<'a> From<&'a mut [Value]> for SliceMut<'a> {
+    fn from(whole: &'a mut [Value]) -> Self {
+        let end = whole.len();
+        Self {
+            whole,
+            start: 0,
+            end,
+        }
+    }
+}
+
 impl<'a> Index<usize> for Slice<'a> {
     type Output = Value;
     fn index(&self, index: usize) -> &Self::Output {
