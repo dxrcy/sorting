@@ -8,8 +8,12 @@ macro_rules! algorithm {
 
         pub fn $name(mut $list: ListRef) -> generator::LocalGenerator<'static, (), Compare> {
             generator::Gn::new_scoped_local(move |mut $scope| {
-                let $list = $list.as_mut_slice();
-                $($body)*
+                yield_!($scope, None);
+                {
+                    let $list = $list.as_mut_slice();
+                    $($body)*
+                }
+                yield_!($scope, None);
                 generator::done()
             })
         }

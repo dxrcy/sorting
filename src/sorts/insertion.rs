@@ -1,6 +1,4 @@
 algorithm!(insertion: |list, scope| {
-    yield_!(scope, None);
-
     for i in 1..list.len() {
         let mut j = i;
         while j > 0 {
@@ -14,6 +12,4 @@ algorithm!(insertion: |list, scope| {
             j -= 1;
         }
     }
-
-    yield_!(scope, None);
 });

@@ -2,14 +2,10 @@ use crate::slice::SliceMut;
 use generator::{done, Scope};
 
 algorithm!(quick: |list, scope| {
-    yield_!(scope, None);
-
     if list.is_empty() {
         done!();
     }
     quick_part(&mut scope, SliceMut::from(list));
-
-    yield_!(scope, None);
 });
 
 fn quick_part(scope: &mut Scope<(), Compare>, mut list: SliceMut) {

@@ -2,9 +2,7 @@ use crate::slice::{Slice, SliceMut};
 use generator::Scope;
 
 algorithm!(merge: |list, scope| {
-    yield_!(scope, None);
     merge_sort(&mut scope, SliceMut::new(list, 0, list.len()));
-    yield_!(scope, None);
 });
 
 fn merge_sort(scope: &mut Scope<(), Compare>, mut list: SliceMut) {

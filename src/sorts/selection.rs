@@ -1,8 +1,6 @@
 use generator::done;
 
 algorithm!(selection: |list, scope| {
-    yield_!(scope, None);
-
     if list.len() <= 1 {
         done!();
     }
@@ -20,6 +18,4 @@ algorithm!(selection: |list, scope| {
 
         list.swap(i, min_index);
     }
-
-    yield_!(scope, None);
 });
