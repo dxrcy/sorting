@@ -18,7 +18,7 @@ fn random_data(rng: &mut impl Rng, length: usize) -> Vec<Value> {
 
 fn test_algorithm<F>(algorithm: F)
 where
-    F: Fn(*mut [Value]) -> LocalGenerator<'static, (), Compare>,
+    F: Fn(ListRef) -> LocalGenerator<'static, (), Compare>,
 {
     let mut rng = rand::thread_rng();
 
@@ -26,7 +26,7 @@ where
         for round in 0..REPEAT {
             let mut list = random_data(&mut rng, length);
 
-            let ptr = list.as_mut_slice() as *mut [Value];
+            let ptr = ListRef::from(&mut list);
             let iter = algorithm(ptr);
 
             // Consumes iterator
