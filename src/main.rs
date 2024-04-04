@@ -101,7 +101,9 @@ fn main() -> io::Result<()> {
         }
 
         for (x, value) in list.iter().enumerate() {
-            let h = *value as f64 * 360.0 / size as f64;
+            let value = *value;
+
+            let h = value as f64 * 360.0 / size as f64;
             let s = 100.0;
             let l = if compare.is_some_and(|[a, b]| a == x || b == x) {
                 100.0
@@ -126,17 +128,17 @@ fn main() -> io::Result<()> {
                 }
 
                 // Compare current y position to value
-                let mut ordering = ((*value as isize - 1) / 2).cmp(&(y as isize));
+                let mut ordering = ((value as isize - 1) / 2).cmp(&(y as isize));
 
                 // Locally sorted, if:
                 //   - Left value is exactly 1 more
                 //   - OR right value is exactly 1 less
                 //   - OR strictly increasing across adjacent values ( LEFT < THIS < RIGHT )
                 // End values are not considered for last condition
-                let is_locally_sorted = (x > 0 && list[x - 1] == *value - 1)
-                    || (x < list.len() - 1 && list[x + 1] == *value + 1)
-                    || ((x == 0 || list[x - 1] < *value)
-                        && (x == list.len() - 1 || list[x + 1] > *value));
+                let is_locally_sorted = (x > 0 && list[x - 1] == value - 1)
+                    || (x < list.len() - 1 && list[x + 1] == value + 1)
+                    || ((x == 0 || list[x - 1] < value)
+                        && (x == list.len() - 1 || list[x + 1] > value));
 
                 // Don't use half blocks if NOT locally sorted
                 if ordering == Ordering::Equal && !is_locally_sorted {
