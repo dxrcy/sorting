@@ -100,6 +100,10 @@ fn main() -> io::Result<()> {
             }
         }
 
+        if args.delay > 0 {
+            thread::sleep(time::Duration::from_millis(args.delay));
+        }
+
         for (x, value) in list.iter().enumerate() {
             let value = *value;
 
@@ -156,10 +160,6 @@ fn main() -> io::Result<()> {
                 };
                 print!("{}", chars);
             }
-        }
-
-        if args.delay > 0 {
-            thread::sleep(time::Duration::from_millis(args.delay));
         }
     }
 
