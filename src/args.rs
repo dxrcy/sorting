@@ -20,8 +20,15 @@ pub struct Args {
     #[clap(short, long, default_value = "0")]
     pub delay: u64,
 
+    /// Render with full height of terminal
+    ///
+    /// By default, height will be reduced by 3 rows.
     #[clap(short, long)]
     pub full_height: bool,
+
+    /// Start with reversed list, not random
+    #[clap(short, long)]
+    pub reversed: bool,
 }
 
 #[derive(Clone, Copy, Debug, ValueEnum)]

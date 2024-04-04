@@ -30,9 +30,12 @@ fn main() -> io::Result<()> {
     });
     let height = (size + 1) / 2;
 
-    let mut list: Vec<_> = (1..=size as Value).collect();
-    let mut rng = rand::thread_rng();
-    list.shuffle(&mut rng);
+    let mut list: Vec<_> = (1..=size as Value).rev().collect();
+
+    if !args.reversed {
+        let mut rng = rand::thread_rng();
+        list.shuffle(&mut rng);
+    }
 
     /// Local macro, see below
     macro_rules! choose_algorithm {
