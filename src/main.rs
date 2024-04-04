@@ -20,7 +20,9 @@ fn main() -> io::Result<()> {
     let size = args.size.unwrap_or_else(|| {
         let (mut width, mut height) = terminal::size().unwrap();
         width /= 2; // 2 columns per value
-        height -= 3; // Account for prompt height after completed
+        if !args.full_height {
+            height -= 3; // Account for prompt height after completed
+        }
         if height * 2 < width {
             width = height * 2;
         }
@@ -73,7 +75,7 @@ fn main() -> io::Result<()> {
     terminal::enable_raw_mode()?;
     let mut stdout = io::stdout();
 
-    execute!(stdout, Clear(ClearType::All), crossterm::cursor::Hide,)?;
+    execute!(stdout, Clear(ClearType::All), crossterm::cursor::Hide)?;
 
     'sort: for compare in iter {
         if event::poll(time::Duration::from_millis(1)).unwrap() {
@@ -110,16 +112,15 @@ fn main() -> io::Result<()> {
                 stdout,
                 SetForegroundColor(Color::Rgb { r, g, b }),
                 // Move to bottom of printed area
-                cursor::MoveToRow(height as u16),
+                cursor::MoveToRow(height as u16 + if args.full_height { 3 } else { 0 }),
             )?;
 
             for y in 0..height {
-                queue!(
-                    stdout,
-                    // Re-align to column (print moves cursor)
-                    cursor::MoveToColumn(x as u16 * 2),
-                    cursor::MoveUp(1),
-                )?;
+                // Re-align to column (print moves cursor)
+                queue!(stdout, cursor::MoveToColumn(x as u16 * 2),)?;
+                if y > 0 || !args.full_height {
+                    queue!(stdout, cursor::MoveUp(1),)?;
+                }
 
                 // Signed distance to top of block
                 let distance = *value as isize / 2 - y as isize;
@@ -142,7 +143,7 @@ fn main() -> io::Result<()> {
 
     execute!(
         stdout,
-        cursor::MoveTo(0, height as u16),
+        cursor::MoveTo(0, height as u16 - if args.full_height { 1 } else { 0 }),
         cursor::Show,
         ResetColor,
     )?;

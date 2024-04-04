@@ -19,6 +19,9 @@ pub struct Args {
     /// Duration to wait between frames
     #[clap(short, long, default_value = "0")]
     pub delay: u64,
+
+    #[clap(short, long)]
+    pub full_height: bool,
 }
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
