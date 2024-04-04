@@ -6,7 +6,7 @@ use super::*;
 
 const VALUE_RANGE: Range<Value> = 0..100;
 const LENGTH_RANGE: Range<usize> = 0..100;
-const REPEAT: usize = 10;
+const REPEAT_EACH: usize = 10;
 
 fn random_data(rng: &mut impl Rng, length: usize) -> Vec<Value> {
     let mut list = Vec::with_capacity(length);
@@ -23,7 +23,7 @@ where
     let mut rng = rand::thread_rng();
 
     for length in LENGTH_RANGE {
-        for round in 0..REPEAT {
+        for round in 0..REPEAT_EACH {
             let mut list = random_data(&mut rng, length);
 
             let ptr = ListRef::from(&mut list);
