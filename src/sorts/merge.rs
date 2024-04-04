@@ -53,9 +53,9 @@ fn merge_part(scope: &mut Scope<(), Compare>, left: Slice, right: Slice, aux: &m
     }
 
     if left_index < left.len() {
-        aux[aux_index..].copy_from_slice(&left[left_index..]);
+        aux[aux_index..].copy_from_slice(&left.as_slice()[left_index..]);
     }
     if right_index < right.len() {
-        aux[aux_index..].copy_from_slice(&right[right_index..]);
+        aux[aux_index..].copy_from_slice(&right.as_slice()[right_index..]);
     }
 }

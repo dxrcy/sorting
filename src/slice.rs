@@ -92,36 +92,3 @@ impl<'a> IndexMut<usize> for SliceMut<'a> {
         &mut self.as_mut_slice()[index]
     }
 }
-
-macro_rules! impl_range {
-    ( $( $ty:ty ),* $(,)? ) => {
-        $(
-            impl<'a> Index<$ty> for Slice<'a> {
-                type Output = [Value];
-                fn index(&self, index: $ty) -> &Self::Output {
-                    &self.as_slice()[index]
-                }
-            }
-            impl<'a> Index<$ty> for SliceMut<'a> {
-                type Output = [Value];
-                fn index(&self, index: $ty) -> &Self::Output {
-                    &self.as_slice()[index]
-                }
-            }
-            impl<'a> IndexMut<$ty> for SliceMut<'a> {
-                fn index_mut(&mut self, index: $ty) -> &mut Self::Output {
-                    &mut self.as_mut_slice()[index]
-                }
-            }
-        )*
-    };
-}
-
-impl_range![
-    RangeFull,               // [..]
-    Range<usize>,            // [x..y]
-    RangeInclusive<usize>,   // [x..=y]
-    RangeTo<usize>,          // [..x]
-    RangeToInclusive<usize>, // [..=x]
-    RangeFrom<usize>,        // [x..]
-];
