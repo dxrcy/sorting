@@ -28,6 +28,7 @@ pub enum Algorithm {
     Merge,
     Quick,
     Selection,
+    Random,
 }
 
 impl Display for Algorithm {

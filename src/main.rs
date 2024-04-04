@@ -8,7 +8,7 @@ use crossterm::{
     style::{Color, ResetColor, SetForegroundColor},
     terminal::{self, Clear, ClearType},
 };
-use rand::seq::SliceRandom;
+use rand::{seq::SliceRandom, Rng};
 use std::{io, process, thread, time};
 
 use args::{Algorithm, Args};
@@ -32,15 +32,43 @@ fn main() -> io::Result<()> {
     let mut rng = rand::thread_rng();
     list.shuffle(&mut rng);
 
-    let ptr = ListRef::from(&mut list);
+    /// Local macro, see below
+    macro_rules! choose_algorithm {
+        (
+            $( $index:literal | $variant:ident => $fn:tt ),*
+            $(,)?
+        ) => {{
+            // Get 'smart' pointer for list -- possibly unsaf
+            let ptr = ListRef::from(&mut list);
+            // Get generator from algorithm enum variant
+            let iter: Box<dyn Iterator<Item = Compare>> = match args.algorithm {
+                $(
+                    Algorithm::$variant => Box::new(sorts::$fn(ptr)),
+                )*
+                Algorithm::Random => Box::new({
+                    let mut rng = rand::thread_rng();
+                    // Get index literal of last pattern
+                    let count = *[ $( $index ),* ].last().unwrap();
+                    // Get function from random index
+                    match rng.gen_range(0..=count) {
+                        $(
+                            $index => sorts::$fn(ptr),
+                        )*
+                        _ => unreachable!("macro is broken"),
+                    }
+                })
+            };
+            iter
+        }};
+    }
 
-    let iter: Box<dyn Iterator<Item = Compare>> = match args.algorithm {
-        Algorithm::Bubble => Box::new(sorts::bubble(ptr)),
-        Algorithm::Insertion => Box::new(sorts::insertion(ptr)),
-        Algorithm::Merge => Box::new(sorts::merge(ptr)),
-        Algorithm::Quick => Box::new(sorts::quick(ptr)),
-        Algorithm::Selection => Box::new(sorts::selection(ptr)),
-    };
+    let iter = choose_algorithm!(
+        0 | Bubble => bubble,
+        1 | Insertion => insertion,
+        2 | Merge => merge,
+        3 | Quick => quick,
+        4 | Selection => selection,
+    );
 
     terminal::enable_raw_mode()?;
     let mut stdout = io::stdout();
