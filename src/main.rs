@@ -122,16 +122,27 @@ fn main() -> io::Result<()> {
                     queue!(stdout, cursor::MoveUp(1),)?;
                 }
 
-                let ordering = ((*value as isize - 1) / 2).cmp(&(y as isize));
-                let is_even = value % 2 == 0;
+                // Compare current y position to value
+                let mut ordering = ((*value as isize - 1) / 2).cmp(&(y as isize));
 
-                let chars = match (ordering, is_even) {
-                    (Ordering::Equal, false) => "\u{2582}\u{2584}", // ▂▄ Short
-                    (Ordering::Equal, true) => "\u{2586}\u{2588}",  // ▆█ Tall
-                    (Ordering::Greater, _) => "\u{2588}\u{2588}",   // ██ Full block
-                    _ => "  ",
+                // Left value is 1 less, or right value is 1 more
+                let is_locally_sorted = (x > 0 && list[x - 1] == *value - 1)
+                    || (x < list.len() - 1 && list[x + 1] == *value + 1);
+
+                // Don't use half blocks if NOT locally sorted
+                if ordering == Ordering::Equal && !is_locally_sorted {
+                    ordering = Ordering::Greater;
+                }
+
+                let is_odd = value % 2 == 1;
+
+                // Choose character to print
+                let chars = match ordering {
+                    Ordering::Equal if is_odd => "\u{2582}\u{2584}", // ▂▄ Short
+                    Ordering::Equal => "\u{2586}\u{2588}",           // ▆█ Tall
+                    Ordering::Greater => "\u{2588}\u{2588}",         // ██ Full block
+                    Ordering::Less => "  ",                          //    Empty
                 };
-
                 print!("{}", chars);
             }
         }
