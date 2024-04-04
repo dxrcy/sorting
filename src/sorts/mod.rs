@@ -37,14 +37,19 @@ macro_rules! slice {
     }};
 }
 
-mod bubble;
-mod insertion;
-mod merge;
-mod quick;
-mod selection;
+macro_rules! define_algorithms {
+    ( $( $name:ident ),* $(,)? ) => {
+        $(
+            mod $name;
+            pub use $name::$name;
+        )*
+    };
+}
 
-pub use bubble::bubble;
-pub use insertion::insertion;
-pub use merge::merge;
-pub use quick::quick;
-pub use selection::selection;
+define_algorithms! {
+    bubble,
+    insertion,
+    merge,
+    quick,
+    selection,
+}
