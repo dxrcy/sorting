@@ -9,7 +9,7 @@ use crossterm::{
     terminal::{self, Clear, ClearType},
 };
 use rand::{seq::SliceRandom, Rng};
-use std::{cmp::Ordering, io, process, thread, time};
+use std::{cmp::Ordering, io, process, thread, time::Duration};
 
 use args::{Algorithm, Args};
 use sorting::{colors::*, hsl_to_rgb, is_sorted, sorts, Compare, ListRef, Value};
@@ -17,6 +17,7 @@ use sorting::{colors::*, hsl_to_rgb, is_sorted, sorts, Compare, ListRef, Value};
 fn main() -> io::Result<()> {
     let args = Args::parse();
 
+    // Get size of list and rendered area
     let size = args.size.unwrap_or_else(|| {
         let (mut width, mut height) = terminal::size().unwrap();
         width /= 2; // 2 columns per value
@@ -30,8 +31,9 @@ fn main() -> io::Result<()> {
     });
     let height = (size + 1) / 2;
 
+    // Create list
     let mut list: Vec<_> = (1..=size as Value).rev().collect();
-
+    // Randomize list, unless `--reversed`
     if !args.reversed {
         let mut rng = rand::thread_rng();
         list.shuffle(&mut rng);
@@ -75,13 +77,14 @@ fn main() -> io::Result<()> {
         4 | Selection => selection,
     );
 
-    terminal::enable_raw_mode()?;
+    // Enable raw mode
     let mut stdout = io::stdout();
-
+    terminal::enable_raw_mode()?;
     execute!(stdout, Clear(ClearType::All), crossterm::cursor::Hide)?;
 
     'sort: for compare in iter {
-        if event::poll(time::Duration::from_millis(1)).unwrap() {
+        // Exit with keypress
+        if event::poll(Duration::from_millis(1)).unwrap() {
             if let Ok(event) = event::read() {
                 match event {
                     Event::Key(KeyEvent {
@@ -100,13 +103,15 @@ fn main() -> io::Result<()> {
             }
         }
 
+        // Frame delay
         if args.delay > 0 {
-            thread::sleep(time::Duration::from_millis(args.delay));
+            thread::sleep(Duration::from_millis(args.delay));
         }
 
         for (x, value) in list.iter().enumerate() {
             let value = *value;
 
+            // Get color from value
             let h = value as f64 * 360.0 / size as f64;
             let s = 100.0;
             let l = if compare.is_some_and(|[a, b]| a == x || b == x) {
@@ -114,7 +119,6 @@ fn main() -> io::Result<()> {
             } else {
                 50.0
             };
-
             let (r, g, b) = hsl_to_rgb(h, s, l);
 
             queue!(
@@ -163,6 +167,7 @@ fn main() -> io::Result<()> {
         }
     }
 
+    // Disable raw mode
     execute!(
         stdout,
         cursor::MoveTo(0, height as u16 - if args.full_height { 1 } else { 0 }),
@@ -171,6 +176,7 @@ fn main() -> io::Result<()> {
     )?;
     terminal::disable_raw_mode()?;
 
+    // Check list is sorted
     if !is_sorted(&list) {
         println!("{BRIGHT}{RED}The list is not sorted.{RESET}");
         process::exit(1);
