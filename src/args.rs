@@ -6,7 +6,7 @@ use clap::{Parser, ValueEnum};
 #[derive(Parser)]
 pub struct Args {
     /// Sorting algorithm to demo
-    #[clap(default_value_t = Algorithm::Selection)]
+    #[clap(default_value_t = Algorithm::Quick)]
     pub algorithm: Algorithm,
 
     /// Length of list
