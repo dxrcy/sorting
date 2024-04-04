@@ -1,24 +1,35 @@
-pub mod colors;
+/// `Slice` and `SliceMut` custom slice types
 pub mod slice;
+/// Sorting algorithms
 pub mod sorts;
 
 #[cfg(test)]
 mod tests;
 
+/// List item value
 pub type Value = u32;
+/// Current list comparison, yielded from generator functions
 pub type Compare = Option<[usize; 2]>;
 
+/// 'Smart' pointer for sharing a mutable reference
+///
+/// # Safety
+///
+/// Trust me.
 pub struct ListRef(*mut [Value]);
 
 impl ListRef {
+    /// Create a 'smart' pointer from a mutable slice
     pub fn from(list: &mut [Value]) -> Self {
         Self(list as *mut [Value])
     }
+    /// Dereference pointer as mutable slice
     pub fn as_mut_slice(&mut self) -> &mut [Value] {
         unsafe { &mut *self.0 }
     }
 }
 
+/// Check if list is sorted
 pub fn is_sorted(list: &[Value]) -> bool {
     if list.is_empty() {
         return true;
@@ -31,6 +42,7 @@ pub fn is_sorted(list: &[Value]) -> bool {
     true
 }
 
+/// Convert HSL to RGB
 pub fn hsl_to_rgb(mut h: f64, mut s: f64, mut l: f64) -> (u8, u8, u8) {
     h /= 360.0;
     s /= 100.0;

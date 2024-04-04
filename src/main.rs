@@ -12,7 +12,7 @@ use rand::{seq::SliceRandom, Rng};
 use std::{cmp::Ordering, io, process, thread, time::Duration};
 
 use args::{Algorithm, Args};
-use sorting::{colors::*, hsl_to_rgb, is_sorted, sorts, Compare, ListRef, Value};
+use sorting::{hsl_to_rgb, is_sorted, sorts, Compare, ListRef, Value};
 
 fn main() -> io::Result<()> {
     let args = Args::parse();
@@ -148,7 +148,7 @@ fn main() -> io::Result<()> {
                     || ((x == 0 || list[x - 1] < value)
                         && (x == list.len() - 1 || list[x + 1] > value));
 
-                // Don't use half blocks if NOT locally sorted
+                // Don't use half blocks unless locally sorted
                 if ordering == Ordering::Equal && !is_locally_sorted {
                     ordering = Ordering::Greater;
                 }
@@ -178,7 +178,7 @@ fn main() -> io::Result<()> {
 
     // Check list is sorted
     if !is_sorted(&list) {
-        println!("{BRIGHT}{RED}The list is not sorted.{RESET}");
+        println!("\x1b[1;31mThe list is not sorted.\x1b[0m");
         process::exit(1);
     }
 
