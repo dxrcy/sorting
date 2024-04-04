@@ -128,9 +128,15 @@ fn main() -> io::Result<()> {
                 // Compare current y position to value
                 let mut ordering = ((*value as isize - 1) / 2).cmp(&(y as isize));
 
-                // Left value is 1 less, or right value is 1 more
+                // Locally sorted, if:
+                //   - Left value is exactly 1 more
+                //   - OR right value is exactly 1 less
+                //   - OR strictly increasing across adjacent values ( LEFT < THIS < RIGHT )
+                // End values are not considered for last condition
                 let is_locally_sorted = (x > 0 && list[x - 1] == *value - 1)
-                    || (x < list.len() - 1 && list[x + 1] == *value + 1);
+                    || (x < list.len() - 1 && list[x + 1] == *value + 1)
+                    || ((x == 0 || list[x - 1] < *value)
+                        && (x == list.len() - 1 || list[x + 1] > *value));
 
                 // Don't use half blocks if NOT locally sorted
                 if ordering == Ordering::Equal && !is_locally_sorted {
