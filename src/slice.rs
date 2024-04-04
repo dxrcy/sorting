@@ -18,12 +18,8 @@ impl<'a> Slice<'a> {
         Self { whole, start, end }
     }
 
-    pub fn with_bounds(&self, start: usize, end: usize) -> Self {
-        Self {
-            whole: self.whole,
-            start: self.start + start,
-            end: self.start + end,
-        }
+    pub fn get_whole(&self) -> &[u32] {
+        self.whole
     }
 
     pub fn as_slice(&self) -> &[Value] {
