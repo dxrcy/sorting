@@ -9,7 +9,7 @@ use crossterm::{
     terminal::{self, Clear, ClearType},
 };
 use rand::{seq::SliceRandom, Rng};
-use std::{io, process, thread, time};
+use std::{cmp::Ordering, io, process, thread, time};
 
 use args::{Algorithm, Args};
 use sorting::{colors::*, hsl_to_rgb, is_sorted, sorts, Compare, ListRef, Value};
@@ -122,17 +122,17 @@ fn main() -> io::Result<()> {
                     queue!(stdout, cursor::MoveUp(1),)?;
                 }
 
-                // Signed distance to top of block
-                let distance = *value as isize / 2 - y as isize;
-                let is_odd = value % 2 == 1;
+                let ordering = ((*value as isize - 1) / 2).cmp(&(y as isize));
+                let is_even = value % 2 == 0;
 
-                if distance > 0 {
-                    print!("\u{2588}\u{2588}"); // Full block
-                } else if distance == 0 && is_odd {
-                    print!("\u{2584}\u{2584}"); // Half block
-                } else {
-                    print!("  "); // Blank
-                }
+                let chars = match (ordering, is_even) {
+                    (Ordering::Equal, false) => "\u{2582}\u{2584}", // ▂▄ Short
+                    (Ordering::Equal, true) => "\u{2586}\u{2588}",  // ▆█ Tall
+                    (Ordering::Greater, _) => "\u{2588}\u{2588}",   // ██ Full block
+                    _ => "  ",
+                };
+
+                print!("{}", chars);
             }
         }
 
