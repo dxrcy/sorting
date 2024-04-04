@@ -11,7 +11,7 @@ algorithm!(selection: |list, scope| {
         let mut min_index = i;
 
         for j in i..list.len() {
-            yield_!(scope, [i, min_index]);
+            yield_!(scope, [j, min_index]);
 
             if list[j] < list[min_index] {
                 min_index = j;
