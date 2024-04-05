@@ -98,7 +98,8 @@ fn main() -> io::Result<()> {
                             break 'sort;
                         }
                     }
-                    _ => break,
+                    // Ignore other terminal events
+                    _ => (),
                 }
             }
         }
@@ -111,58 +112,86 @@ fn main() -> io::Result<()> {
         for (x, value) in list.iter().enumerate() {
             let value = *value;
 
-            // Get color from value
-            let h = value as f64 * 360.0 / size as f64;
-            let s = 100.0;
-            let l = if compare.is_some_and(|[a, b]| a == x || b == x) {
-                100.0
-            } else {
-                50.0
-            };
-            let (r, g, b) = hsl_to_rgb(h, s, l);
+            // Locally sorted, if:
+            //   - Left value is exactly 1 more
+            //   - OR right value is exactly 1 less
+            //   - OR strictly increasing across adjacent values ( LEFT < THIS < RIGHT )
+            // End values are not considered for last condition
+            let is_locally_sorted = (x > 0 && list[x - 1] == value - 1)
+                || (x < list.len() - 1 && list[x + 1] == value + 1)
+                || ((x == 0 || list[x - 1] < value)
+                    && (x == list.len() - 1 || list[x + 1] > value));
 
-            queue!(
-                stdout,
-                SetForegroundColor(Color::Rgb { r, g, b }),
-                // Move to bottom of printed area
-                cursor::MoveToRow(height as u16 + if args.full_height { 3 } else { 0 }),
-            )?;
-
-            for y in 0..height {
-                // Re-align to column (print moves cursor)
-                queue!(stdout, cursor::MoveToColumn(x as u16 * 2),)?;
-                if y > 0 || !args.full_height {
-                    queue!(stdout, cursor::MoveUp(1),)?;
-                }
-
-                // Compare current y position to value
-                let mut ordering = ((value as isize - 1) / 2).cmp(&(y as isize));
-
-                // Locally sorted, if:
-                //   - Left value is exactly 1 more
-                //   - OR right value is exactly 1 less
-                //   - OR strictly increasing across adjacent values ( LEFT < THIS < RIGHT )
-                // End values are not considered for last condition
-                let is_locally_sorted = (x > 0 && list[x - 1] == value - 1)
-                    || (x < list.len() - 1 && list[x + 1] == value + 1)
-                    || ((x == 0 || list[x - 1] < value)
-                        && (x == list.len() - 1 || list[x + 1] > value));
-
-                // Don't use half blocks unless locally sorted
-                if ordering == Ordering::Equal && !is_locally_sorted {
-                    ordering = Ordering::Greater;
-                }
-
-                let is_odd = value % 2 == 1;
-
-                // Choose character to print
-                let chars = match ordering {
-                    Ordering::Equal if is_odd => "\u{2582}\u{2584}", // ▂▄ Short
-                    Ordering::Equal => "\u{2586}\u{2588}",           // ▆█ Tall
-                    Ordering::Greater => "\u{2588}\u{2588}",         // ██ Full block
-                    Ordering::Less => "  ",                          //    Empty
+            // Two subcolumns (one character wide) per value column
+            for subcolumn in 0..2 {
+                // Use smoother gradient if locally sorted
+                let subcolumn_hue = if is_locally_sorted && subcolumn == 1 {
+                    0.5
+                } else {
+                    0.0
                 };
-                print!("{}", chars);
+
+                // Current value is being compared in this iteration
+                let is_compared = compare.is_some_and(|[a, b]| a == x || b == x);
+
+                // Set foreground color from list value
+                let hue = (value as f64 + subcolumn_hue) * 360.0 / size as f64;
+                let saturation = 100.0;
+                let lightness = if is_compared { 100.0 } else { 50.0 }; // White if being compared
+                let rgb = hsl_to_rgb(hue, saturation, lightness);
+                queue!(stdout, SetForegroundColor(Color::from(rgb)),)?;
+
+                // Move to bottom of printed area
+                let full_height_offset = if args.full_height { 3 } else { 0 };
+                queue!(
+                    stdout,
+                    SetForegroundColor(Color::from(rgb)),
+                    cursor::MoveToRow(height as u16 + full_height_offset),
+                )?;
+
+                for y in 0..height {
+                    // Re-align to column (print moves cursor)
+                    queue!(stdout, cursor::MoveToColumn(x as u16 * 2 + subcolumn),)?;
+                    if y > 0 || !args.full_height {
+                        queue!(stdout, cursor::MoveUp(1))?;
+                    }
+
+                    // Compare current y position to value
+                    let mut ordering = (y as isize).cmp(&((value as isize - 1) / 2));
+
+                    // Don't divide subcolmn with different blocks unless locally sorted
+                    if ordering == Ordering::Equal && !is_locally_sorted {
+                        ordering = Ordering::Less;
+                    }
+
+                    ///   Empty whitespace
+                    pub const QUARTERS_0: char = ' ';
+                    /// ▂ One quarter block
+                    pub const QUARTERS_1: char = '\u{2582}';
+                    /// ▄ Half block
+                    pub const QUARTERS_2: char = '\u{2584}';
+                    /// ▆ Three quarter block
+                    pub const QUARTERS_3: char = '\u{2586}';
+                    /// █ Full block
+                    pub const QUARTERS_4: char = '\u{2588}';
+
+                    // Get modular index of subcolumn, to draw appropriate character
+                    let column_type = (value + 1) % 2 * 2; // 0 or 2
+                    let subcolumn_type = column_type + subcolumn as u32; // 0..=3
+
+                    // Choose character to print
+                    let chars = match ordering {
+                        Ordering::Greater => QUARTERS_0,
+                        Ordering::Less => QUARTERS_4,
+                        Ordering::Equal => match subcolumn_type {
+                            0 => QUARTERS_1,
+                            1 => QUARTERS_2,
+                            2 => QUARTERS_3,
+                            _ => QUARTERS_4,
+                        },
+                    };
+                    print!("{}", chars);
+                }
             }
         }
     }
