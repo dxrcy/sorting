@@ -1,16 +1,13 @@
 #[macro_use]
 mod macros;
 
-/// Sorting algorithms
-pub mod sorts {
-    define_algorithms! {
-        bubble,
-        insertion,
-        merge,
-        quick,
-        selection,
-        shell,
-    }
+define_algorithms! {
+    0 | Bubble    => bubble,
+    1 | Insertion => insertion,
+    2 | Merge     => merge,
+    3 | Quick     => quick,
+    4 | Selection => selection,
+    5 | Shell     => shell,
 }
 
 /// `Slice` and `SliceMut` custom slice types

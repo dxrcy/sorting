@@ -42,11 +42,14 @@ macro_rules! slice {
 }
 
 macro_rules! define_algorithms {
-    ( $( $name:ident ),* $(,)? ) => {
-        $(
-            mod $name;
-            pub use $name::$name;
-        )*
+    ( $( $index:literal | $Name:ident => $name:ident ),* $(,)? ) => {
+        /// Sorting algorithms
+        pub mod sorts {
+            $(
+                mod $name;
+                pub use $name::$name;
+            )*
+        }
 
         #[cfg(test)]
         mod algorithms {
@@ -56,6 +59,46 @@ macro_rules! define_algorithms {
                     crate::tests::test_algorithm(crate::sorts::$name);
                 }
             )*
+        }
+
+
+        #[derive(Clone, Copy, Debug, clap::ValueEnum)]
+        pub enum Algorithm {
+            $(
+                $Name,
+            )*
+            Random,
+        }
+
+        impl std::fmt::Display for Algorithm {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                use clap::ValueEnum;
+                write!(f, "{}", self.to_possible_value().unwrap().get_name())
+            }
+        }
+
+        impl Algorithm {
+            /// Create generator function for choosen algorithm
+            pub fn create(&self, list: ListRef) -> generator::LocalGenerator<'static, (), Compare> {
+                use rand::Rng;
+                match self {
+                    $(
+                        Algorithm::$Name => sorts::$name(list),
+                    )*
+                    Algorithm::Random => {
+                        let mut rng = rand::thread_rng();
+                        // Get index literal of last pattern
+                        let count = *[ $( $index ),* ].last().unwrap();
+                        // Get function from random index
+                        match rng.gen_range(0..=count) {
+                            $(
+                                $index => sorts::$name(list),
+                            )*
+                            _ => unreachable!("macro is broken"),
+                        }
+                    }
+                }
+            }
         }
     };
 }

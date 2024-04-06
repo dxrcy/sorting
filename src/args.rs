@@ -1,6 +1,6 @@
-use std::fmt::Display;
+use clap::Parser;
 
-use clap::{Parser, ValueEnum};
+use sorting::Algorithm;
 
 /// Animate sorting algorithms in the terminal
 #[derive(Parser)]
@@ -29,21 +29,4 @@ pub struct Args {
     /// Start with reversed list, not random
     #[clap(short, long)]
     pub reversed: bool,
-}
-
-#[derive(Clone, Copy, Debug, ValueEnum)]
-pub enum Algorithm {
-    Bubble,
-    Insertion,
-    Merge,
-    Quick,
-    Selection,
-    Random,
-    Shell,
-}
-
-impl Display for Algorithm {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.to_possible_value().unwrap().get_name())
-    }
 }

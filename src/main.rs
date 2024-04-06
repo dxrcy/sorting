@@ -8,11 +8,11 @@ use crossterm::{
     style::{Color, ResetColor, SetForegroundColor},
     terminal::{self, Clear, ClearType},
 };
-use rand::{seq::SliceRandom, Rng};
+use rand::seq::SliceRandom;
 use std::{cmp::Ordering, io, process, thread, time::Duration};
 
-use args::{Algorithm, Args};
-use sorting::{hsl_to_rgb, is_sorted, sorts, Compare, ListRef, Value};
+use args::Args;
+use sorting::{hsl_to_rgb, is_sorted, ListRef, Value};
 
 fn main() -> io::Result<()> {
     let args = Args::parse();
@@ -39,51 +39,15 @@ fn main() -> io::Result<()> {
         list.shuffle(&mut rng);
     }
 
-    /// Local macro, see below
-    macro_rules! choose_algorithm {
-        (
-            $( $index:literal | $variant:ident => $fn:tt ),*
-            $(,)?
-        ) => {{
-            // Get 'smart' pointer for list -- possibly unsaf
-            let ptr = ListRef::from(&mut list);
-            // Get generator from algorithm enum variant
-            let iter: Box<dyn Iterator<Item = Compare>> = match args.algorithm {
-                $(
-                    Algorithm::$variant => Box::new(sorts::$fn(ptr)),
-                )*
-                Algorithm::Random => Box::new({
-                    let mut rng = rand::thread_rng();
-                    // Get index literal of last pattern
-                    let count = *[ $( $index ),* ].last().unwrap();
-                    // Get function from random index
-                    match rng.gen_range(0..=count) {
-                        $(
-                            $index => sorts::$fn(ptr),
-                        )*
-                        _ => unreachable!("macro is broken"),
-                    }
-                })
-            };
-            iter
-        }};
-    }
-
-    let iter = choose_algorithm!(
-        0 | Bubble    => bubble,
-        1 | Insertion => insertion,
-        2 | Merge     => merge,
-        3 | Quick     => quick,
-        4 | Selection => selection,
-        5 | Shell     => shell,
-    );
+    // Create generator
+    let generator = args.algorithm.create(ListRef::from(&mut list));
 
     // Enable raw mode
     let mut stdout = io::stdout();
     terminal::enable_raw_mode()?;
     execute!(stdout, Clear(ClearType::All), crossterm::cursor::Hide)?;
 
-    'sort: for compare in iter {
+    'step: for compare in generator {
         // Exit with keypress
         if event::poll(Duration::from_millis(1)).unwrap() {
             if let Ok(event) = event::read() {
@@ -96,7 +60,7 @@ fn main() -> io::Result<()> {
                             || (code == KeyCode::Char('c')
                                 && modifiers.contains(KeyModifiers::CONTROL))
                         {
-                            break 'sort;
+                            break 'step;
                         }
                     }
                     // Ignore other terminal events
