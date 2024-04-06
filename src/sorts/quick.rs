@@ -1,4 +1,4 @@
-use crate::slice::SliceMut;
+use crate::{slice::*, Compare};
 use generator::{done, Scope};
 
 algorithm!(quick: |list, scope| {

@@ -1,4 +1,4 @@
-use crate::slice::{Slice, SliceMut};
+use crate::{slice::*, Compare, Value};
 use generator::Scope;
 
 algorithm!(merge: |list, scope| {

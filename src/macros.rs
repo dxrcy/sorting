@@ -66,10 +66,7 @@ macro_rules! algorithm {
         $name:ident : | $list:ident, $scope:ident |
         { $($body:tt)* }
     ) => {
-        #[allow(unused_imports)]
-        use crate::{Compare, ListRef, Value};
-
-        pub fn $name(mut $list: ListRef) -> generator::LocalGenerator<'static, (), Compare> {
+        pub fn $name(mut $list: crate::ListRef) -> generator::LocalGenerator<'static, (), crate::Compare> {
             generator::Gn::new_scoped_local(move |mut $scope| {
                 yield_!($scope, None);
                 {
