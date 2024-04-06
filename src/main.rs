@@ -105,11 +105,6 @@ fn main() -> io::Result<()> {
             }
         }
 
-        // Frame delay
-        if args.delay > 0 {
-            thread::sleep(Duration::from_millis(args.delay));
-        }
-
         for (x, value) in list.iter().enumerate() {
             let value = *value;
 
@@ -194,6 +189,11 @@ fn main() -> io::Result<()> {
                     print!("{}", chars);
                 }
             }
+        }
+
+        // Frame delay
+        if args.delay > 0 {
+            thread::sleep(Duration::from_millis(args.delay));
         }
     }
 
