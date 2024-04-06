@@ -61,7 +61,7 @@ macro_rules! define_algorithms {
             )*
         }
 
-
+        /// Sorting algorithm identifier
         #[derive(Clone, Copy, Debug, clap::ValueEnum)]
         pub enum Algorithm {
             $(

@@ -1,3 +1,4 @@
+///! Tests defined in `define_algorithms!` macro
 use generator::LocalGenerator;
 use rand::Rng;
 use std::ops::Range;
@@ -43,4 +44,3 @@ fn random_data(rng: &mut impl Rng, length: usize) -> Vec<Value> {
     }
     list
 }
-
