@@ -1,7 +1,19 @@
+#[macro_use]
+mod macros;
+
+/// Sorting algorithms
+pub mod sorts {
+    define_algorithms! {
+        bubble,
+        insertion,
+        merge,
+        quick,
+        selection,
+    }
+}
+
 /// `Slice` and `SliceMut` custom slice types
 pub mod slice;
-/// Sorting algorithms
-pub mod sorts;
 
 #[cfg(test)]
 mod tests;

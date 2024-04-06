@@ -47,13 +47,15 @@ macro_rules! define_algorithms {
             mod $name;
             pub use $name::$name;
         )*
-    };
-}
 
-define_algorithms! {
-    bubble,
-    insertion,
-    merge,
-    quick,
-    selection,
+        #[cfg(test)]
+        mod algorithms {
+            $(
+                #[test]
+                fn $name() {
+                    crate::tests::test_algorithm(crate::sorts::$name);
+                }
+            )*
+        }
+    };
 }

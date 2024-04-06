@@ -8,15 +8,7 @@ const VALUE_RANGE: Range<Value> = 0..100;
 const LENGTH_RANGE: Range<usize> = 0..100;
 const REPEAT_EACH: usize = 10;
 
-fn random_data(rng: &mut impl Rng, length: usize) -> Vec<Value> {
-    let mut list = Vec::with_capacity(length);
-    for _ in 0..length {
-        list.push(rng.gen_range(VALUE_RANGE));
-    }
-    list
-}
-
-fn test_algorithm<F>(algorithm: F)
+pub fn test_algorithm<F>(algorithm: F)
 where
     F: Fn(ListRef) -> LocalGenerator<'static, (), Compare>,
 {
@@ -44,19 +36,11 @@ where
     }
 }
 
-#[test]
-fn bubble() {
-    test_algorithm(sorts::bubble);
+fn random_data(rng: &mut impl Rng, length: usize) -> Vec<Value> {
+    let mut list = Vec::with_capacity(length);
+    for _ in 0..length {
+        list.push(rng.gen_range(VALUE_RANGE));
+    }
+    list
 }
-#[test]
-fn insertion() {
-    test_algorithm(sorts::insertion);
-}
-#[test]
-fn selection() {
-    test_algorithm(sorts::selection);
-}
-#[test]
-fn quick() {
-    test_algorithm(sorts::quick);
-}
+
