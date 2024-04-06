@@ -7,7 +7,12 @@ algorithm!(shell: |list, scope| {
             let temp = list[i];
             let mut j = i;
 
-            while j >= gap && list[j - gap] > temp {
+            while j >= gap {
+                yield_!(scope, [j, i]);
+                if list[j - gap] <= temp {
+                    break;
+                }
+
                 list[j] = list[j - gap];
                 j -= gap;
             }
