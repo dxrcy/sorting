@@ -70,11 +70,12 @@ fn main() -> io::Result<()> {
     }
 
     let iter = choose_algorithm!(
-        0 | Bubble => bubble,
+        0 | Bubble    => bubble,
         1 | Insertion => insertion,
-        2 | Merge => merge,
-        3 | Quick => quick,
+        2 | Merge     => merge,
+        3 | Quick     => quick,
         4 | Selection => selection,
+        5 | Shell     => shell,
     );
 
     // Enable raw mode

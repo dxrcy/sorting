@@ -9,6 +9,7 @@ pub mod sorts {
         merge,
         quick,
         selection,
+        shell,
     }
 }
 

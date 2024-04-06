@@ -39,6 +39,7 @@ pub enum Algorithm {
     Quick,
     Selection,
     Random,
+    Shell,
 }
 
 impl Display for Algorithm {
