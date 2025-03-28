@@ -8,6 +8,7 @@ define_algorithms! {
     3 | Quick     => quick,
     4 | Selection => selection,
     5 | Shell     => shell,
+    6 | Bogo      => bogo,
 }
 
 /// `Slice` and `SliceMut` custom slice types
