@@ -2,13 +2,14 @@
 mod macros;
 
 define_algorithms! {
-    0 | Bubble    => bubble,
+    0 | Bubble => bubble,
     1 | Insertion => insertion,
-    2 | Merge     => merge,
-    3 | Quick     => quick,
+    2 | Merge => merge,
+    3 | Quick => quick,
     4 | Selection => selection,
-    5 | Shell     => shell,
-    6 | Bogo      => bogo,
+    5 | Shell => shell,
+    6 | Bogo => bogo,
+    7 | PancakeSelection => pancake_selection,
 }
 
 /// `Slice` and `SliceMut` custom slice types
